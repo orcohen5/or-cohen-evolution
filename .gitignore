@@ -1,0 +1,16 @@
+.tmp
+*.iml
+.idea/*.iml
+.idea/*.xml
+src/gen
+lib
+.idea/*
+.idea
+.idea/workspace.xml
+.idea/gradle.xml
+.idea/compiler.xml
+.idea/misc.xml
+.idea/inspectionProfiles
+.idea/copyright
+.idea/libraries
+target/*
