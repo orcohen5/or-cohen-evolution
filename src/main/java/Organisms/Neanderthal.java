@@ -1,16 +1,16 @@
 package Organisms;
 
-public class Neanderthal extends Tribe {
+public class Neanderthal extends Organism {
     public Neanderthal(String name) {
         super(name);
     }
 
     @Override
     public String getType() {
-        return "Neanderthal";
+        return getClass().getSimpleName();
     }
 
-    public void increasePropertyOneToFiveTimes() {
-        this.setStrength(this.getStrength()+2);
+    public void increaseOrganismProperty() {
+        this.setStrength(this.getStrength() + 2);
     }
 }

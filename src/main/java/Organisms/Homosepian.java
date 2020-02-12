@@ -1,16 +1,16 @@
 package Organisms;
 
-public class Homosepian extends Tribe {
+public class Homosepian extends Organism {
     public Homosepian(String name) {
         super(name);
     }
 
     @Override
     public String getType() {
-        return "Homosepian";
+        return getClass().getSimpleName();
     }
 
-    public void increasePropertyOneToFiveTimes() {
-        this.setIntelligence(this.getIntelligence()+2);
+    public void increaseOrganismProperty() {
+        this.setIntelligence(this.getIntelligence() + 2);
     }
 }

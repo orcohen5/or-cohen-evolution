@@ -1,17 +1,17 @@
 package Organisms;
 
-public class Homoebolis extends Tribe {
+public class Homoebolis extends Organism {
     public Homoebolis(String name) {
         super(name);
     }
 
     @Override
     public String getType() {
-        return "Homoebolis";
+        return getClass().getSimpleName();
     }
 
-    public void increasePropertyOneToFiveTimes() {
-        this.setStrength(this.getStrength()+1);
-        this.setIntelligence(this.getIntelligence()+1);
+    public void increaseOrganismProperty() {
+        this.setStrength(this.getStrength() + 1);
+        this.setIntelligence(this.getIntelligence() + 1);
     }
 }

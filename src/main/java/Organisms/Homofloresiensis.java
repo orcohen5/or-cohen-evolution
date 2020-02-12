@@ -1,17 +1,17 @@
 package Organisms;
 
-public class Homofloresiensis extends Tribe {
+public class Homofloresiensis extends Organism {
     public Homofloresiensis(String name) {
         super(name);
     }
 
     @Override
     public String getType() {
-        return "Homofloresiensis";
+        return getClass().getSimpleName();
     }
 
-    public void increasePropertyOneToFiveTimes() {
-        this.setIntelligence(this.getIntelligence()+1);
-        this.setTechnologicalMeans(this.getTechnologicalMeans()+1);
+    public void increaseOrganismProperty() {
+        this.setIntelligence(this.getIntelligence() + 1);
+        this.setTechnologicalMeans(this.getTechnologicalMeans() + 1);
     }
 }
