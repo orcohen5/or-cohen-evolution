@@ -1,39 +1,56 @@
 package Places;
 
-import Organisms.Tribe;
+import Organisms.Organism;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class Continent {
-
+public class Continent extends Thread {
+    private final int THREADS_NUMBER = 3;
     private String name;
-    private ArrayList<Tribe> tribesInContinent;
+    private ArrayList<Organism> organismsInContinent;
+    private ExecutorService executor;
 
     public Continent(String name) {
         this.name = name;
-        tribesInContinent = new ArrayList<Tribe>();
-
+        organismsInContinent = new ArrayList<Organism>();
     }
 
-    public void addTribeToContinent(Tribe tribe) {
-        tribesInContinent.add(tribe);
+    public ArrayList<Organism> getOrganismsInContinent() {
+        return organismsInContinent;
     }
 
-    public ArrayList<Tribe> getTribesInContinent() {
-        return tribesInContinent;
+    public void setOrganismsInContinent(ArrayList<Organism> organismsInContinent) {
+        this.organismsInContinent = organismsInContinent;
     }
 
-    public void setTribesInContinent(ArrayList<Tribe> tribesInContinent) {
-        this.tribesInContinent = tribesInContinent;
+    public void addOrganismToContinent(Organism organism) {
+        organismsInContinent.add(organism);
+    }
+
+    public void runCycle() {
+        this.executor = Executors.newFixedThreadPool(THREADS_NUMBER);
+
+        for(int i = 0; i < this.organismsInContinent.size(); i++) {
+            executor.execute(this.organismsInContinent.get(i));
+        }
+        this.executor.shutdown();
+    }
+
+    @Override
+    public void run() {
+        runCycle();
+        System.out.println(toString());
     }
 
     @Override
     public String toString() {
-        String info = "";
+        String continentData = "";
 
-        for(Tribe tribe: tribesInContinent) {
-            info += ""+name+" -> "+tribe.toString()+"\n";
+        for(Organism organism : organismsInContinent) {
+            continentData += name + " -> " + organism.toString() + "\n";
         }
-        return info;
+        return continentData;
     }
 }
