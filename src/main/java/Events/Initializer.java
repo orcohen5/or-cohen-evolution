@@ -3,14 +3,14 @@ package Events;
 import Organisms.*;
 import Places.Continent;
 import Places.Planet;
+import org.apache.log4j.BasicConfigurator;
 
-public class EvolutionInitializer {
-
-    public EvolutionInitializer() {
-
+public class Initializer {
+    public static void initializeLog() {
+        BasicConfigurator.configure();
     }
 
-    public void initialize() {
+    public static void initializeEvolution() {
         Homosepian homosepian = new Homosepian("Nadav");
         Neanderthal neanderthal = new Neanderthal("Sapir");
         Homoerectus homoerectus = new Homoerectus("Tal");
@@ -26,6 +26,6 @@ public class EvolutionInitializer {
         Planet planet = Planet.getInstance();
         planet.addContinentToPlanet(asia);
         planet.addContinentToPlanet(africa);
-        planet.executeLifeCycleEverySecond();
+        planet.runLifeCycleEverySecond();
     }
 }
