@@ -1,12 +1,13 @@
 package Places;
 
 import Organisms.Organism;
-
+import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Continent extends Thread {
+    private final Logger log = Logger.getLogger(Continent.class);
     private final int THREADS_NUMBER = 3;
     private String name;
     private ArrayList<Organism> organismsInContinent;
@@ -14,43 +15,49 @@ public class Continent extends Thread {
 
     public Continent(String name) {
         this.name = name;
-        organismsInContinent = new ArrayList<Organism>();
-    }
-
-    public ArrayList<Organism> getOrganismsInContinent() {
-        return organismsInContinent;
-    }
-
-    public void setOrganismsInContinent(ArrayList<Organism> organismsInContinent) {
-        this.organismsInContinent = organismsInContinent;
+        this.organismsInContinent = new ArrayList<Organism>();
     }
 
     public void addOrganismToContinent(Organism organism) {
-        organismsInContinent.add(organism);
-    }
-
-    public void runCycle() {
-        this.executor = Executors.newFixedThreadPool(THREADS_NUMBER);
-
-        for(int i = 0; i < this.organismsInContinent.size(); i++) {
-            executor.execute(this.organismsInContinent.get(i));
-        }
-        this.executor.shutdown();
+        this.organismsInContinent.add(organism);
     }
 
     @Override
     public void run() {
-        runCycle();
-        System.out.println(toString());
+        runCycleInContinent();
+
     }
 
     @Override
     public String toString() {
-        String continentData = "";
+        StringBuilder builder = new StringBuilder();
+        builder.append(System.getProperty("line.separator"));
 
-        for(Organism organism : organismsInContinent) {
-            continentData += name + " -> " + organism.toString() + "\n";
+        for(Organism organism : this.organismsInContinent) {
+            builder.append(this.name);
+            builder.append(" -> ");
+            builder.append(organism.toString());
+            builder.append(System.getProperty("line.separator"));
         }
+        String continentData = builder.toString();
         return continentData;
+    }
+
+    private void runCycleInContinent() {
+        runOrganismsLifeCycle();
+        log.debug(toString());
+    }
+
+    private void runOrganismsLifeCycle() {
+        this.executor = Executors.newFixedThreadPool(THREADS_NUMBER);
+        runLifeCycleOfEachOrganism();
+        this.executor.shutdown();
+    }
+
+    private void runLifeCycleOfEachOrganism() {
+
+        for(int i = 0; i < this.organismsInContinent.size(); i++) {
+            this.executor.execute(this.organismsInContinent.get(i));
+        }
     }
 }
