@@ -53,35 +53,33 @@ public abstract class Organism extends Thread {
         this.technologicalMeans = technologicalMeans;
     }
 
-    public int getBalance() {
-        return this.balance;
-    }
-
-    public void setBalance(int balance) {
-        this.balance = balance;
-    }
-
-    public int getMultiplication() {
-        return multiplication;
-    }
-
-    public void runCycle() {
-        increaseOnePropertyRandomly();
-        increasePropertyIfNeedToIncrease();
-        increaseBalance();
-    }
-
     public void run() {
-        runCycle();
+        runOrganismCycle();
     }
 
     public String toString() {
-        return this.name + " -> [Strength=" + strength + ", Intelligence=" + intelligence + ", Technological Means=" + technologicalMeans + ", Balance=" + balance + "] Thread[" + Thread.currentThread().getName() + "][" + getType() + "]";
+        StringBuilder builder = new StringBuilder();
+        builder.append(this.name);
+        builder.append(" -> ").append("[");
+        builder.append("Strength=").append(this.strength).append(", ");
+        builder.append("Intelligence=").append(this.intelligence).append(", ");
+        builder.append("Technological Means=").append(this.technologicalMeans).append(", ");
+        builder.append("Balance=").append(this.balance).append("] ");
+        builder.append("Thread[").append(Thread.currentThread().getName()).append("]");
+        builder.append("[").append(getType()).append("]");
+        String organismData = builder.toString();
+        return organismData;
     }
 
     public abstract String getType();
 
     public abstract void increaseOrganismProperty();
+
+    private void runOrganismCycle() {
+        increaseOnePropertyRandomly();
+        increasePropertyIfNeedToIncrease();
+        increaseBalance();
+    }
 
     private void increaseOnePropertyRandomly() {
         Random r = new Random();
