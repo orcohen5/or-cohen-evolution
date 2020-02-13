@@ -46,7 +46,7 @@ public class Planet extends TimerTask {
         builder.append(System.getProperty("line.separator"));
         builder.append("Planet Started!");
         String startMessage = builder.toString();
-        log.debug(startMessage);
+        log.info(startMessage);
     }
 
     private void runPlanetCycle() {
@@ -59,7 +59,7 @@ public class Planet extends TimerTask {
         builder.append(System.getProperty("line.separator"));
         builder.append("______________");
         String divider = builder.toString();
-        log.debug(divider);
+        log.info(divider);
     }
 
     private void runLifeCycleInContinents() {

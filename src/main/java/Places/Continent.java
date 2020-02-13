@@ -45,7 +45,7 @@ public class Continent extends Thread {
 
     private void runCycleInContinent() {
         runOrganismsLifeCycle();
-        log.debug(toString());
+        log.info(toString());
     }
 
     private void runOrganismsLifeCycle() {
