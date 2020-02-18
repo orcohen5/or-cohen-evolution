@@ -10,7 +10,7 @@ public class Neanderthal extends Organism {
         return getClass().getSimpleName();
     }
 
-    public void increaseOrganismProperty() {
+    public void increaseProperties() {
         this.setStrength(this.getStrength() + 2);
     }
 }

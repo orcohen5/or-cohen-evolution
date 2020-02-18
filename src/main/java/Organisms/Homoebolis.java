@@ -10,7 +10,7 @@ public class Homoebolis extends Organism {
         return getClass().getSimpleName();
     }
 
-    public void increaseOrganismProperty() {
+    public void increaseProperties() {
         this.setStrength(this.getStrength() + 1);
         this.setIntelligence(this.getIntelligence() + 1);
     }

@@ -10,7 +10,7 @@ public class Homoerectus extends Organism {
         return getClass().getSimpleName();
     }
 
-    public void increaseOrganismProperty() {
+    public void increaseProperties() {
         this.setTechnologicalMeans(this.getTechnologicalMeans() + 2);
     }
 }

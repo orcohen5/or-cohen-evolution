@@ -10,7 +10,7 @@ public class Homosepian extends Organism {
         return getClass().getSimpleName();
     }
 
-    public void increaseOrganismProperty() {
+    public void increaseProperties() {
         this.setIntelligence(this.getIntelligence() + 2);
     }
 }

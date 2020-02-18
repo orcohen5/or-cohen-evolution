@@ -10,7 +10,7 @@ public class Homofloresiensis extends Organism {
         return getClass().getSimpleName();
     }
 
-    public void increaseOrganismProperty() {
+    public void increaseProperties() {
         this.setIntelligence(this.getIntelligence() + 1);
         this.setTechnologicalMeans(this.getTechnologicalMeans() + 1);
     }
