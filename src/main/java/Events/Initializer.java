@@ -3,29 +3,43 @@ package Events;
 import Organisms.*;
 import Places.Continent;
 import Places.Planet;
-import org.apache.log4j.BasicConfigurator;
+
+import java.util.ArrayList;
+import java.util.Timer;
 
 public class Initializer {
-    public static void initializeLog() {
-        BasicConfigurator.configure();
+    private Planet planet;
+    private Continent asia;
+    private Continent africa;
+    private ArrayList<Organism> asianOrganismsList;
+    private ArrayList<Organism> africanOrganismsList;
+    private ArrayList<Continent> continentsList;
+    private Timer timer;
+
+    public Initializer() {
+        this.asianOrganismsList = new ArrayList();
+        this.africanOrganismsList = new ArrayList();
+        this.continentsList = new ArrayList();
     }
 
-    public static void initializeEvolution() {
-        Homosepian homosepian = new Homosepian("Nadav");
-        Neanderthal neanderthal = new Neanderthal("Sapir");
-        Homoerectus homoerectus = new Homoerectus("Tal");
-        Homoebolis homoebolis = new Homoebolis("Yehuda");
-        Homofloresiensis homofloresiensis = new Homofloresiensis("Or");
-        Continent asia = new Continent("Asia");
-        Continent africa = new Continent("Africa");
-        asia.addOrganismToContinent(homosepian);
-        asia.addOrganismToContinent(neanderthal);
-        africa.addOrganismToContinent(homoerectus);
-        africa.addOrganismToContinent(homoebolis);
-        asia.addOrganismToContinent(homofloresiensis);
-        Planet planet = Planet.getInstance();
-        planet.addContinentToPlanet(asia);
-        planet.addContinentToPlanet(africa);
-        planet.runLifeCycleEverySecond();
+    public void initializeEvolution() {
+        planet = Planet.getInstance();
+        asia = new Continent("Asia");
+        africa = new Continent("Africa");
+        asianOrganismsList.add(new Homosepian("Nadav"));
+        asianOrganismsList.add(new Neanderthal("Sapir"));
+        africanOrganismsList.add(new Homoerectus("Tal"));
+        africanOrganismsList.add(new Homoebolis("Yehuda"));
+        asianOrganismsList.add(new Homofloresiensis("Or"));
+        asia.add(asianOrganismsList);
+        africa.add(africanOrganismsList);
+        continentsList.add(asia);
+        continentsList.add(africa);
+        planet.add(continentsList);
+    }
+
+    public void startLifeCycle() {
+        timer = new Timer();
+        timer.schedule(planet, 0, 1000);
     }
 }
