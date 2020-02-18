@@ -1,16 +1,14 @@
 package Organisms;
 
-import java.util.Random;
+import Utilities.Randomizer;
 
 public abstract class Organism extends Thread {
     private final int STRENGTH = 1;
     private final int INTELLIGENCE = 2;
     private final int TECHNOLOGICAL_MEANS = 3;
-    private final int FIRST_PROPERTY_INDEX = 1;
-    private final int LAST_PROPERTY_INDEX = 3;
-    private final int YES = 1;
-    private final int FIRST_TIME = 1;
-    private final int NUMBER_OF_FEW_TIMES = 5;
+    private final int NUMBER_OF_PROPERTIES = 3;
+    private final int INCREASE = 1;
+    private final int NUMBER_OF_OPTIONS = 5;
     private double strength;
     private double intelligence;
     private double technologicalMeans;
@@ -30,7 +28,7 @@ public abstract class Organism extends Thread {
     }
 
     public double getStrength() {
-        return this.strength;
+        return strength;
     }
 
     public void setStrength(double strength) {
@@ -38,7 +36,7 @@ public abstract class Organism extends Thread {
     }
 
     public double getIntelligence() {
-        return this.intelligence;
+        return intelligence;
     }
 
     public void setIntelligence(double intelligence) {
@@ -46,66 +44,57 @@ public abstract class Organism extends Thread {
     }
 
     public double getTechnologicalMeans() {
-        return this.technologicalMeans;
+        return technologicalMeans;
     }
 
     public void setTechnologicalMeans(double technologicalMeans) {
         this.technologicalMeans = technologicalMeans;
     }
 
-    public void run() {
-        runOrganismCycle();
-    }
-
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(this.name);
-        builder.append(" -> ").append("[");
-        builder.append("Strength=").append(this.strength).append(", ");
-        builder.append("Intelligence=").append(this.intelligence).append(", ");
-        builder.append("Technological Means=").append(this.technologicalMeans).append(", ");
-        builder.append("Balance=").append(this.balance).append("] ");
-        builder.append("Thread[").append(Thread.currentThread().getName()).append("]");
-        builder.append("[").append(getType()).append("]");
-        String organismData = builder.toString();
-        return organismData;
-    }
-
     public abstract String getType();
 
-    public abstract void increaseOrganismProperty();
+    public abstract void increaseProperties();
 
-    private void runOrganismCycle() {
-        increaseOnePropertyRandomly();
-        increasePropertyIfNeedToIncrease();
+    public void run() {
+        increaseCyclically();
+        increaseOptionally();
         increaseBalance();
     }
 
-    private void increaseOnePropertyRandomly() {
-        Random r = new Random();
-        int propertyToIncrease = r.nextInt((LAST_PROPERTY_INDEX - FIRST_PROPERTY_INDEX) + 1) + FIRST_PROPERTY_INDEX;
+    public String toString() {
+        String organismData = name + " -> [" +
+                "Strength=" + strength + ", " +
+                "Intelligence=" + intelligence + ", " +
+                "Technological Means=" + technologicalMeans + ", " +
+                "Balance=" + balance + "] " +
+                "Thread[" + currentThread().getName() + "]" +
+                "[" + getType() + "]";
+        return organismData;
+    }
+
+    private void increaseCyclically() {
+        int propertyToIncrease = Randomizer.getRandomNumber(NUMBER_OF_PROPERTIES);
 
         if (propertyToIncrease == STRENGTH) {
-            this.strength = this.strength * this.mutation;
+            strength *= mutation;
         }
-        if (propertyToIncrease == INTELLIGENCE) {
-            this.intelligence = this.intelligence * this.mutation;
+        else if (propertyToIncrease == INTELLIGENCE) {
+            intelligence *= mutation;
         }
-        if (propertyToIncrease == TECHNOLOGICAL_MEANS) {
-            this.technologicalMeans = this.technologicalMeans * this.mutation;
+        else if (propertyToIncrease == TECHNOLOGICAL_MEANS) {
+            technologicalMeans *= mutation;
         }
     }
 
-    private void increasePropertyIfNeedToIncrease() {
-        Random r = new Random();
-        int needToIncrease = r.nextInt((NUMBER_OF_FEW_TIMES - FIRST_TIME) + 1) + FIRST_TIME;
+    private void increaseOptionally() {
+        int option = Randomizer.getRandomNumber(NUMBER_OF_OPTIONS);
 
-        if (needToIncrease == YES) {
-            increaseOrganismProperty();
+        if (option == INCREASE) {
+            increaseProperties();
         }
     }
 
     private void increaseBalance() {
-        this.balance = this.balance * this.multiplication;
+        balance *= multiplication;
     }
 }
