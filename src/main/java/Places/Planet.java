@@ -1,23 +1,21 @@
 package Places;
 
-import org.apache.log4j.Logger;
+import Utilities.ExecutorServiceUtil;
+import Utilities.LoggerUtil;
+
 import java.util.ArrayList;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class Planet extends TimerTask {
     private static Planet instance = null;
-    private final Logger log = Logger.getLogger(Planet.class);
-    private final int THREADS_NUMBER = 3;
-    private ArrayList<Continent> continentsInPlanet;
+    private ArrayList<Continent> continents;
     private ExecutorService executor;
 
     private Planet() {
-        printStartMessage();
-        this.continentsInPlanet = new ArrayList<Continent>();
-        this.executor = Executors.newFixedThreadPool(THREADS_NUMBER);
+        notifyStart();
+        this.continents = new ArrayList();
+        this.executor = ExecutorServiceUtil.getExecutor();
     }
 
     public static Planet getInstance() {
@@ -28,44 +26,31 @@ public class Planet extends TimerTask {
         return instance;
     }
 
-    public void addContinentToPlanet(Continent continent) {
-        this.continentsInPlanet.add(continent);
+    public void add(ArrayList<Continent> continentsList) {
+
+        for(Continent continent : continentsList) {
+            continents.add(continent);
+        }
     }
 
-    public void runLifeCycleEverySecond() {
-        Timer timer = new Timer();
-        timer.schedule(this, 0, 1000);
+    public void add(Continent continent) {
+        continents.add(continent);
     }
 
     public void run() {
-        runPlanetCycle();
+        lifeCycle();
     }
 
-    private void printStartMessage() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(System.getProperty("line.separator"));
-        builder.append("Planet Started!");
-        String startMessage = builder.toString();
-        log.info(startMessage);
+    private void notifyStart() {
+        String startMessage = "Planet Started!";
+        LoggerUtil.logData(startMessage);
     }
 
-    private void runPlanetCycle() {
-        printDivider();
-        runLifeCycleInContinents();
-    }
+    private void lifeCycle() {
+        LoggerUtil.logData("______________");
 
-    private void printDivider() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(System.getProperty("line.separator"));
-        builder.append("______________");
-        String divider = builder.toString();
-        log.info(divider);
-    }
-
-    private void runLifeCycleInContinents() {
-
-        for(int i = 0; i < this.continentsInPlanet.size(); i++) {
-            this.executor.execute(this.continentsInPlanet.get(i));
+        for(int i = 0; i < continents.size(); i++) {
+            executor.execute(continents.get(i));
         }
     }
 }
