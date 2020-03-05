@@ -4,41 +4,38 @@ import Organisms.*;
 import Places.Continent;
 import Places.Planet;
 
-import java.util.ArrayList;
-import java.util.Timer;
+import java.util.*;
 
-public class Initializer {
+public class EvolutionManager {
     private Planet planet;
     private Continent asia;
     private Continent africa;
-    private ArrayList<Organism> asianOrganismsList;
-    private ArrayList<Organism> africanOrganismsList;
-    private ArrayList<Continent> continentsList;
+    private List<Organism> asianOrganismsList;
+    private List<Organism> africanOrganismsList;
+    private List<Continent> continentsList;
     private Timer timer;
 
-    public Initializer() {
+    public EvolutionManager() {
         this.asianOrganismsList = new ArrayList();
         this.africanOrganismsList = new ArrayList();
         this.continentsList = new ArrayList();
     }
 
     public void initializeEvolution() {
-        planet = Planet.getInstance();
-        asia = new Continent("Asia");
-        africa = new Continent("Africa");
         asianOrganismsList.add(new Homosepian("Nadav"));
-        asianOrganismsList.add(new Neanderthal("Sapir"));
+        africanOrganismsList.add(new Neanderthal("Sapir"));
         africanOrganismsList.add(new Homoerectus("Tal"));
-        africanOrganismsList.add(new Homoebolis("Yehuda"));
+        asianOrganismsList.add(new Homoebolis("Yehuda"));
+        africanOrganismsList.add(new Homosepian("Shalom"));
         asianOrganismsList.add(new Homofloresiensis("Or"));
-        asia.add(asianOrganismsList);
-        africa.add(africanOrganismsList);
+        asia = new Continent("Asia", asianOrganismsList);
+        africa = new Continent("Africa", africanOrganismsList);
         continentsList.add(asia);
         continentsList.add(africa);
-        planet.add(continentsList);
+        planet = Planet.getInstance(continentsList);
     }
 
-    public void startLifeCycle() {
+    public void startEvolution() {
         timer = new Timer();
         timer.schedule(planet, 0, 1000);
     }

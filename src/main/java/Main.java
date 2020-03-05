@@ -1,9 +1,9 @@
-import Events.Initializer;
+import Events.EvolutionManager;
 
 public class Main {
     public static void main(String[] args) {
-        Initializer initializer = new Initializer();
-        initializer.initializeEvolution();
-        initializer.startLifeCycle();
+        EvolutionManager evolutionManager = new EvolutionManager();
+        evolutionManager.initializeEvolution();
+        evolutionManager.startEvolution();
     }
 }
