@@ -13,9 +13,11 @@ public abstract class Organism extends Thread {
     private double intelligence;
     private double technologicalMeans;
     private double mutation;
-    private int balance;
+    private long balance;
     private int multiplication;
     private String name;
+    private boolean isAttacker;
+    private boolean isDefender;
 
     public Organism(String name) {
         this.strength = 1.0;
@@ -25,6 +27,8 @@ public abstract class Organism extends Thread {
         this.balance = 1;
         this.multiplication = 3;
         this.name = name;
+        this.isAttacker = false;
+        this.isDefender = false;
     }
 
     public double getStrength() {
@@ -51,12 +55,44 @@ public abstract class Organism extends Thread {
         this.technologicalMeans = technologicalMeans;
     }
 
+    public long getBalance() {
+        return balance;
+    }
+
+    public void setBalance(long balance) {
+        this.balance = balance;
+    }
+
+    public String getOrganismName() {
+        return name;
+    }
+
+    public boolean isAttacker() {
+        return isAttacker;
+    }
+
+    public void setAttacker(boolean attacker) {
+        isAttacker = attacker;
+    }
+
+    public boolean isDefender() {
+        return isDefender;
+    }
+
+    public void setDefender(boolean defender) {
+        isDefender = defender;
+    }
+
+    public double getSumOfProperties() {
+        return strength + intelligence + technologicalMeans;
+    }
+
     public abstract String getType();
 
     public abstract void increaseProperties();
 
     public void run() {
-        increaseCyclically();
+        increaseConstantly();
         increaseOptionally();
         increaseBalance();
     }
@@ -72,7 +108,7 @@ public abstract class Organism extends Thread {
         return organismData;
     }
 
-    private void increaseCyclically() {
+    private void increaseConstantly() {
         int propertyToIncrease = Randomizer.getRandomNumber(NUMBER_OF_PROPERTIES);
 
         if (propertyToIncrease == STRENGTH) {
