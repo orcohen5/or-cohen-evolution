@@ -13,15 +13,6 @@ public class Planet extends TimerTask {
     private static Planet instance = null;
     private List<Continent> continents;
     private ExecutorService executor;
-    private List<Organism> fightingOrganisms;
-    private List<String> continentsNames;
-    private Organism attacker;
-    private Organism defender;
-    private String attackingContinentName;
-    private String defendingContinentName;
-    private String attackerName;
-    private String defenderName;
-    private int numberOfOrganisms;
     private boolean isFirstCycle;
 
     private Planet(List<Continent> continents) {
@@ -59,15 +50,16 @@ public class Planet extends TimerTask {
     }
 
     private void notifyStart() {
-        String startMessage = "Planet Started!";
+        String startMessage = "Planet Started!" + "\n______________";
         LoggerUtil.logData(startMessage);
     }
 
-    private void startLifeCycle() {
+    private synchronized void startLifeCycle() {
 
         for(int i = 0; i < continents.size(); i++) {
             executor.execute(continents.get(i));
         }
+
         if(isFirstCycle)
             isFirstCycle = false;
         else
