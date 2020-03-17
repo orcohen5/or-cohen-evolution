@@ -44,7 +44,7 @@ public class EvolutionManager {
         europeanOrganismsList.add(new Homofloresiensis("Netanel"));
         americanOrganismsList.add(new Homosepian("Shalom"));
         americanOrganismsList.add(new Neanderthal("Ori"));
-        americanOrganismsList.add(new Homoebolis("Bar"));
+        americanOrganismsList.add(new Homoebolis("Efi"));
         asia = new Continent("Asia", asianOrganismsList);
         africa = new Continent("Africa", africanOrganismsList);
         europe = new Continent("Europe", europeanOrganismsList);

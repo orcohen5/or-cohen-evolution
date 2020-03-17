@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 public class Continent extends Thread {
+    private final int DIFFERENCE = 5;
+    private final int MINIMUM_BALANCE = 1;
     private String name;
     private List<Organism> organisms;
     private List<Organism> currentAttackers;
@@ -111,7 +113,7 @@ public class Continent extends Thread {
                 if(isFightPossible(attacker, defender)) {
                     currentAttackers.add(attacker);
                     currentDefenders.add(defender);
-                    long originalAttackerBalance = Long.parseLong("" + attacker.getBalance());
+                    long originalAttackerBalance = attacker.getBalance();
                     announceFight(attacker, defender);
 
                     if(attacker.getBalance() < (defender.getBalance() / 2)) {
@@ -137,9 +139,9 @@ public class Continent extends Thread {
 
     public boolean isFightPossible(Organism attacker, Organism defender) {
         return isAttackerNotDefending(attacker) && isDefenderNotFighting(defender) &&
-                (attacker.getSumOfProperties() - defender.getSumOfProperties() > 5) &&
-                isAttackerAndDefenderAlive(attacker, defender) &&
-                attacker.getBalance() >= 1 && defender.getBalance() >= 1;
+                (attacker.getSumOfProperties() - defender.getSumOfProperties() > DIFFERENCE) &&
+                areAttackerAndDefenderAlive(attacker, defender) &&
+                areAttackerAndDefenderHavePeople(attacker, defender);
     }
 
     private boolean isAttackerNotDefending(Organism attacker) {
@@ -150,8 +152,12 @@ public class Continent extends Thread {
         return !currentDefenders.contains(defender) && !currentAttackers.contains(defender);
     }
 
-    private boolean isAttackerAndDefenderAlive(Organism attacker, Organism defender) {
+    private boolean areAttackerAndDefenderAlive(Organism attacker, Organism defender) {
         return attacker.isOrganismAlive() && defender.isOrganismAlive();
+    }
+
+    private boolean areAttackerAndDefenderHavePeople(Organism attacker, Organism defender) {
+        return attacker.getBalance() >= MINIMUM_BALANCE && defender.getBalance() >= MINIMUM_BALANCE;
     }
 
     private void announceFight(Organism attacker, Organism defender) {
