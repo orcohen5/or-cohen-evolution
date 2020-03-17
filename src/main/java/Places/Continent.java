@@ -12,14 +12,16 @@ import java.util.concurrent.ExecutorService;
 public class Continent extends Thread {
     private String name;
     private List<Organism> organisms;
-    private List<Organism> defendersToRemove;
-    private List<Organism> attackersToRemove;
+    private List<Organism> currentAttackers;
+    private List<Organism> currentDefenders;
     private ExecutorService executor;
+    private String fightData;
 
     public Continent(String name, List<Organism> organisms) {
         this.name = name;
         this.organisms = organisms;
         this.executor = ExecutorServiceUtil.getExecutor();
+        this.fightData = "";
     }
 
     public String getContinentName() {
@@ -74,49 +76,58 @@ public class Continent extends Thread {
         return continentData;
     }
 
-    private void startLifeCycle() {
+    private synchronized void startLifeCycle() {
 
-        for(int i = 0; i < organisms.size(); i++) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        String continentData = "";
+
+        for (int i = 0; i < organisms.size(); i++) {
             executor.execute(organisms.get(i));
         }
+        continentData = getContinentData();
         startOrganismsFight();
-        LoggerUtil.logData(getContinentData());
+
+        if(fightData == "")
+            LoggerUtil.logData(continentData);
+        else
+            LoggerUtil.logData(continentData + fightData);
     }
 
     private void startOrganismsFight() {
-        defendersToRemove = new ArrayList();
-        attackersToRemove = new ArrayList();
+        currentAttackers = new ArrayList();
+        currentDefenders = new ArrayList();
+        List<Organism> defendersToRemove = new ArrayList();
+        List<Organism> attackersToRemove = new ArrayList();
+        fightData = "";
 
         for(Organism attacker : organisms) {
 
             for(Organism defender : organisms) {
 
-                if(isAttackerNotDefending(attacker) && isDefenderNotFighting(defender)) {
+                if(isFightPossible(attacker, defender)) {
+                    currentAttackers.add(attacker);
+                    currentDefenders.add(defender);
+                    long originalAttackerBalance = Long.parseLong("" + attacker.getBalance());
+                    announceFight(attacker, defender);
 
-                    if(attacker.getSumOfProperties() - defender.getSumOfProperties() > 5) {
-
-                        if(attacker.getBalance() >= 1 && defender.getBalance() >= 1) {
-                            attacker.setAttacker(true);
-                            defender.setDefender(true);
-                            LoggerUtil.logData("Battle Attacker -> " + attacker.toString());
-                            LoggerUtil.logData("Battle Defender -> " + defender.toString());
-
-                            if(attacker.getBalance() < (defender.getBalance() / 2)) {
-                                attacker.setBalance(0);
-                                attackersToRemove.add(attacker);
-                                LoggerUtil.logData(attacker.getOrganismName() + " attack " + defender.getOrganismName() +
-                                        "-> result = Tie" + "\n");
-                            }
-                            else {
-                                attacker.setBalance(attacker.getBalance() - (defender.getBalance() / 2));
-                                LoggerUtil.logData(attacker.getOrganismName() + " attack " + defender.getOrganismName() +
-                                        "-> result = " + attacker.getOrganismName() + " Wins" + "\n");
-                            }
-                            attacker.setAttacker(false);
-                            defender.setDefender(false);
-                            defendersToRemove.add(defender);
-                        }
+                    if(attacker.getBalance() < (defender.getBalance() / 2)) {
+                        attacker.setBalance(0);
+                        attacker.setOrganismAlive(false);
+                        attackersToRemove.add(attacker);
+                        announceDraw(attacker, defender);
                     }
+                    else {
+                        attacker.setBalance(attacker.getBalance() - (defender.getBalance() / 2));
+                        announceWinnerAndLoser(attacker, defender, originalAttackerBalance);
+                    }
+                    defender.setOrganismAlive(false);
+                    defendersToRemove.add(defender);
+                    currentDefenders.remove(defender);
+                    currentAttackers.remove(attacker);
                 }
             }
         }
@@ -124,11 +135,44 @@ public class Continent extends Thread {
         removeOrganisms(attackersToRemove);
     }
 
+    public boolean isFightPossible(Organism attacker, Organism defender) {
+        return isAttackerNotDefending(attacker) && isDefenderNotFighting(defender) &&
+                (attacker.getSumOfProperties() - defender.getSumOfProperties() > 5) &&
+                isAttackerAndDefenderAlive(attacker, defender) &&
+                attacker.getBalance() >= 1 && defender.getBalance() >= 1;
+    }
+
     private boolean isAttackerNotDefending(Organism attacker) {
-        return !attacker.isDefender();
+        return !currentDefenders.contains(attacker);
     }
 
     private boolean isDefenderNotFighting(Organism defender) {
-        return !defender.isDefender() && !defender.isAttacker();
+        return !currentDefenders.contains(defender) && !currentAttackers.contains(defender);
+    }
+
+    private boolean isAttackerAndDefenderAlive(Organism attacker, Organism defender) {
+        return attacker.isOrganismAlive() && defender.isOrganismAlive();
+    }
+
+    private void announceFight(Organism attacker, Organism defender) {
+        fightData += "\nThere is a fight in " + getContinentName() + ":\n" +
+                attacker.getOrganismName() + " attack " + defender.getOrganismName() + "\n" +
+                "Battle Attacker -> " + attacker.toString() + "\n" +
+                "Battle Defender -> " + defender.toString() + "\n";
+    }
+
+    private void announceDraw(Organism attacker, Organism defender) {
+        fightData += attacker.getOrganismName() + " attack " + defender.getOrganismName() +
+                " -> result = Draw\n" +
+                attacker.getOrganismName() + " and " + defender.getOrganismName() +
+                " have extincted from " + getContinentName() + "\n";
+    }
+
+    private void announceWinnerAndLoser(Organism attacker, Organism defender, long originalAttackerBalance) {
+        fightData += attacker.getOrganismName() + " attack " + defender.getOrganismName() +
+                " -> result = " + attacker.getOrganismName() + " wins\n" +
+                attacker.getOrganismName() + " has reduced from " + originalAttackerBalance +
+                " to " + attacker.getBalance() + "\n" +
+                defender.getOrganismName() + " has extincted from " + getContinentName() + "\n";
     }
 }
