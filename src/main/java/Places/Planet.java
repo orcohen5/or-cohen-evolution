@@ -22,11 +22,13 @@ public class Planet extends TimerTask {
     private String attackerName;
     private String defenderName;
     private int numberOfOrganisms;
+    private boolean isFirstCycle;
 
     private Planet(List<Continent> continents) {
         notifyStart();
         this.continents = continents;
         this.executor = ExecutorServiceUtil.getExecutor();
+        this.isFirstCycle = true;
     }
 
     public static Planet getInstance(List<Continent> continents) {
@@ -62,90 +64,13 @@ public class Planet extends TimerTask {
     }
 
     private void startLifeCycle() {
-        LoggerUtil.logData("______________");
-        startFightBetweenContinentsWinners();
 
         for(int i = 0; i < continents.size(); i++) {
             executor.execute(continents.get(i));
         }
-    }
-
-    private void startFightBetweenContinentsWinners() {
-        numberOfOrganisms = 0;
-        fightingOrganisms = new ArrayList();
-        continentsNames = new ArrayList();
-
-        for(Continent attackingContinent : continents) {
-
-            for(Continent defendingContinent : continents) {
-
-                if(isOnlyOneOrganismInEachContinent(attackingContinent, defendingContinent)) {
-                    attacker = getOrganismsInContinent(attackingContinent).get(0);
-                    defender = getOrganismsInContinent(defendingContinent).get(0);
-                    attackingContinentName = attackingContinent.getContinentName();
-                    defendingContinentName = defendingContinent.getContinentName();
-                    attackerName = attacker.getOrganismName();
-                    defenderName = defender.getOrganismName();
-
-                    if(attacker.getSumOfProperties() - defender.getSumOfProperties() > 5) {
-                        LoggerUtil.logData("Continent War Attacker -> " + attacker.toString() + " from " + attackingContinent.getContinentName());
-                        LoggerUtil.logData("Continent War Defender -> " + defender.toString() + " from " + defendingContinent.getContinentName());
-
-                        if(attacker.getBalance() < (defender.getBalance() / 2)) {
-                            attacker.setBalance(0);
-                            attackingContinent.removeOrganism(attacker);
-                        }
-                        else {
-                            attacker.setBalance(attacker.getBalance() - (defender.getBalance() / 2));
-                        }
-                        defendingContinent.removeOrganism(defender);
-                        logFightData(attackingContinent);
-                    }
-                }
-            }
-        }
-
-        for(Continent continent : continents) {
-
-            if(continent.getOrganisms().size() != 0) {
-                numberOfOrganisms += getOrganismsInContinent(continent).size();
-                fightingOrganisms.addAll(getOrganismsInContinent(continent));
-                continentsNames.add(continent.getContinentName());
-            }
-        }
-
-        if(isPlanetHasToBeStopped())
-            stopPlanet();
-    }
-
-    private boolean isOnlyOneOrganismInEachContinent(Continent first, Continent second) {
-        return getOrganismsInContinent(first).size() == 1 && getOrganismsInContinent(second).size() == 1;
-    }
-
-    private void logFightData(Continent attackingContinent) {
-        String fightData = attackingContinentName + ":" + attackerName + " attack " +
-                defendingContinentName + ":" + defenderName +
-                "-> result = ";
-
-        if(getOrganismsInContinent(attackingContinent).size() == 0)
-            LoggerUtil.logData(fightData + "Tie");
+        if(isFirstCycle)
+            isFirstCycle = false;
         else
-            LoggerUtil.logData(fightData + attackingContinentName + ":" + attackerName + " wins");
-    }
-
-    private boolean isPlanetHasToBeStopped() {
-        return numberOfOrganisms == 1 || numberOfOrganisms == 0;
-    }
-
-    private void stopPlanet() {
-
-        if(numberOfOrganisms == 1) {
-            LoggerUtil.logData("Winner ->" + continentsNames.get(0) + " -> " + fightingOrganisms.get(0).toString());
-            fightingOrganisms.remove(fightingOrganisms.get(0));
-            continentsNames.remove(continentsNames.get(0));
-            numberOfOrganisms--;
-        }
-        LoggerUtil.logData("Planet Stopped!");
-        System.exit(0);
+            LoggerUtil.logData("______________");
     }
 }
