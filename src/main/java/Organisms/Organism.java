@@ -16,8 +16,7 @@ public abstract class Organism extends Thread {
     private long balance;
     private int multiplication;
     private String name;
-    private boolean isAttacker;
-    private boolean isDefender;
+    private boolean isAlive;
 
     public Organism(String name) {
         this.strength = 1.0;
@@ -27,8 +26,7 @@ public abstract class Organism extends Thread {
         this.balance = 1;
         this.multiplication = 3;
         this.name = name;
-        this.isAttacker = false;
-        this.isDefender = false;
+        this.isAlive = true;
     }
 
     public double getStrength() {
@@ -67,20 +65,12 @@ public abstract class Organism extends Thread {
         return name;
     }
 
-    public boolean isAttacker() {
-        return isAttacker;
+    public boolean isOrganismAlive() {
+        return isAlive;
     }
 
-    public void setAttacker(boolean attacker) {
-        isAttacker = attacker;
-    }
-
-    public boolean isDefender() {
-        return isDefender;
-    }
-
-    public void setDefender(boolean defender) {
-        isDefender = defender;
+    public void setOrganismAlive(boolean alive) {
+        isAlive = alive;
     }
 
     public double getSumOfProperties() {
@@ -99,10 +89,10 @@ public abstract class Organism extends Thread {
 
     public String toString() {
         String organismData = name + " -> [" +
-                "Strength=" + strength + ", " +
-                "Intelligence=" + intelligence + ", " +
-                "Technological Means=" + technologicalMeans + ", " +
-                "Balance=" + balance + "] " +
+                "Strength = " + strength + ", " +
+                "Intelligence = " + intelligence + ", " +
+                "Technological Means = " + technologicalMeans + ", " +
+                "Balance = " + balance + "] " +
                 "Thread[" + currentThread().getName() + "]" +
                 "[" + getType() + "]";
         return organismData;
