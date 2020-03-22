@@ -1,4 +1,4 @@
-package Organisms;
+package org.iaf.evolution.entities.organisms;
 
 public class Homoerectus extends Organism {
     public Homoerectus(String name) {

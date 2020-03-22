@@ -1,4 +1,4 @@
-package Organisms;
+package org.iaf.evolution.entities.organisms;
 
 public class Homofloresiensis extends Organism {
     public Homofloresiensis(String name) {

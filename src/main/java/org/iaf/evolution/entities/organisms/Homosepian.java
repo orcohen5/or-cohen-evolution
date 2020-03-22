@@ -1,4 +1,4 @@
-package Organisms;
+package org.iaf.evolution.entities.organisms;
 
 public class Homosepian extends Organism {
     public Homosepian(String name) {
