@@ -1,4 +1,4 @@
-package Utilities;
+package org.iaf.evolution.utilities;
 
 import java.util.Random;
 
@@ -7,11 +7,13 @@ public class Randomizer {
 
     public static int getRandomNumber(int maximumValue) {
         int randomNumber = random.nextInt(maximumValue + 1);
+
         return randomNumber;
     }
 
     public static int getRandomNumber(int minimumValue, int maximumValue) {
         int randomNumber = random.nextInt((maximumValue - minimumValue) + 1) + minimumValue;
+
         return randomNumber;
     }
 }
