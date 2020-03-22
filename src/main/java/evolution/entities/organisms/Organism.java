@@ -1,16 +1,19 @@
 package evolution.entities.organisms;
 
-import evolution.utilities.LoggerUtil;
 import evolution.utilities.Randomizer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-public abstract class Organism extends Thread {
+import static java.lang.Thread.currentThread;
+
+public abstract class Organism implements Runnable {
+    private static Logger logger = LogManager.getLogger(Organism.class);
     private final int STRENGTH = 1;
     private final int INTELLIGENCE = 2;
     private final int TECHNOLOGICAL_MEANS = 3;
     private final int NUMBER_OF_PROPERTIES = 3;
     private final int INCREASE = 1;
     private final int NUMBER_OF_OPTIONS = 5;
-    private final int DIFFERENCE_BETWEEN_PROPERTIES = 5;
     private final int NOT_FIGHTING_YET = -1;
     private final int DRAW = 0;
     private final int DEFENDER_WIN = 1;
@@ -22,7 +25,6 @@ public abstract class Organism extends Thread {
     private long balance;
     private int multiplication;
     private String name;
-    private String fightData;
 
     public Organism(String name) {
         this.strength = 1.0;
@@ -99,34 +101,29 @@ public abstract class Organism extends Thread {
     public int attack(Organism defender) {
         synchronized (this) {
             synchronized (defender) {
-                fightData = "";
+                StringBuilder builder = new StringBuilder();
                 int result = NOT_FIGHTING_YET;
+                addFightersToFightAnnouncement(defender, builder);
 
-                if(isFightPossible(defender)) {
-                    addFightersToFightAnnouncement(defender);
-
-                    if (isDraw(defender)) {
-                        balance = 0;
-                        defender.balance = 0;
-                        result = DRAW;
-                    } else if (isDefenderWin(defender)) {
-                        defender.balance = defender.balance - (balance / 2);
-                        balance = 0;
-                        result = DEFENDER_WIN;
-                    } else {
-                        balance = balance - (defender.balance / 2);
-                        defender.balance = 0;
-                        result = ATTACKER_WIN;
-                    }
-                    addResultToFightAnnouncement(defender, result);
-                    LoggerUtil.logData(fightData);
+                if (isDraw(defender)) {
+                    balance = 0;
+                    defender.balance = 0;
+                    result = DRAW;
+                } else if (isDefenderWin(defender)) {
+                    defender.balance = defender.balance - (balance / 2);
+                    balance = 0;
+                    result = DEFENDER_WIN;
+                } else {
+                    balance = balance - (defender.balance / 2);
+                    defender.balance = 0;
+                    result = ATTACKER_WIN;
                 }
+                addResultToFightAnnouncement(defender, result, builder);
+                logger.info(builder.toString());
 
                 return result;
             }
-
         }
-
     }
 
     private void increaseConstantly() {
@@ -139,7 +136,6 @@ public abstract class Organism extends Thread {
         } else if (propertyToIncrease == TECHNOLOGICAL_MEANS) {
             technologicalMeans *= mutation;
         }
-
     }
 
     private void increaseOptionally() {
@@ -153,36 +149,31 @@ public abstract class Organism extends Thread {
         balance *= multiplication;
     }
 
-    private void addFightersToFightAnnouncement(Organism defender) {
-        fightData += "\nBattle Attacker -> " + toString() + "\n" +
+    private void addFightersToFightAnnouncement(Organism defender, StringBuilder builder) {
+        builder.append("\nBattle Attacker -> " + toString() + "\n" +
                 "Battle Defender -> " + defender.toString() + "\n" +
-                name + " attack " + defender.name + " -> result = ";
+                name + " attack " + defender.name + " -> result = ");
     }
 
-    private void addResultToFightAnnouncement(Organism defender, int result) {
+    private void addResultToFightAnnouncement(Organism defender, int result, StringBuilder builder) {
         if(result == DRAW)
-            addDraw();
+            addDraw(builder);
         else if(result == DEFENDER_WIN)
-            addDefenderWin(defender);
+            addDefenderWin(defender, builder);
         else if(result == ATTACKER_WIN)
-            addAttackerWin();
+            addAttackerWin(builder);
     }
 
-    private void addDraw() {
-        fightData += "Draw\n";
+    private void addDraw(StringBuilder builder) {
+        builder.append("Draw\n");
     }
 
-    private void addDefenderWin(Organism defender) {
-        fightData += defender.name + " wins\n";
+    private void addDefenderWin(Organism defender, StringBuilder builder) {
+        builder.append(defender.name + " wins\n");
     }
 
-    private void addAttackerWin() {
-        fightData += name + " wins\n";
-    }
-
-    private boolean isFightPossible(Organism defender) {
-        return getSumOfProperties() - defender.getSumOfProperties() > DIFFERENCE_BETWEEN_PROPERTIES &&
-                balance > 0 && defender.balance > 0;
+    private void addAttackerWin(StringBuilder builder) {
+        builder.append(name + " wins\n");
     }
 
     private boolean isDraw(Organism defender) {

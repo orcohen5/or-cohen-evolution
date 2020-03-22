@@ -2,14 +2,15 @@ package evolution.entities;
 
 import evolution.entities.organisms.Organism;
 import evolution.utilities.ExecutorServiceUtil;
-import evolution.utilities.LoggerUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
-import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 
-public class Planet extends TimerTask {
+public class Planet implements Runnable {
     private static Planet instance = null;
+    private static Logger logger = LogManager.getLogger(Planet.class);
     private List<Continent> continents;
     private ExecutorService executor;
 
@@ -19,7 +20,6 @@ public class Planet extends TimerTask {
     }
 
     public static Planet getInstance() {
-
         if(instance == null) {
             instance = new Planet();
         }
@@ -40,11 +40,9 @@ public class Planet extends TimerTask {
     }
 
     public void addContinents(List<Continent> continentsList) {
-
         for(Continent continent : continentsList) {
             continents.add(continent);
         }
-
     }
 
     public void addContinent(Continent continent) {
@@ -57,15 +55,14 @@ public class Planet extends TimerTask {
 
     private void notifyStart() {
         String startMessage = "Planet Started!";
-        LoggerUtil.logData(startMessage);
+        logger.info(startMessage);
     }
 
     private void startLifeCycle() {
-
         for(Continent continent: continents) {
             executor.execute(continent);
         }
 
-        LoggerUtil.logData("______________");
+        logger.info("______________");
     }
 }

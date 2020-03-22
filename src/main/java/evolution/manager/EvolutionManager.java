@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class EvolutionManager {
     private ScheduledExecutorService executorScheduler;
+    private Planet planet;
 
     public EvolutionManager() {
         this.executorScheduler = ExecutorServiceUtil.getExecutorScheduler();
@@ -22,6 +23,7 @@ public class EvolutionManager {
         List<Organism> europeanOrganismsList = new ArrayList();
         List<Organism> americanOrganismsList = new ArrayList();
         List<Continent> continentsList = new ArrayList();
+
         asianOrganismsList.add(new Homosepian("Nadav"));
         asianOrganismsList.add(new Homoebolis("Yehuda"));
         asianOrganismsList.add(new Homofloresiensis("Or"));
@@ -34,16 +36,17 @@ public class EvolutionManager {
         americanOrganismsList.add(new Homosepian("Shalom"));
         americanOrganismsList.add(new Neanderthal("Ori"));
         americanOrganismsList.add(new Homoebolis("Efi"));
+
         continentsList.add(new Continent("Asia", asianOrganismsList));
         continentsList.add(new Continent("Africa", africanOrganismsList));
         continentsList.add(new Continent("Europe", europeanOrganismsList));
         continentsList.add(new Continent("America", americanOrganismsList));
-        Planet planet = Planet.getInstance();
+
+        planet = Planet.getInstance();
         planet.setContinents(continentsList);
-        startEvolution(planet);
     }
 
-    public void startEvolution(Planet planet) {
+    public void startEvolution() {
         executorScheduler.scheduleAtFixedRate(planet, 0, 1, TimeUnit.SECONDS);
     }
 }

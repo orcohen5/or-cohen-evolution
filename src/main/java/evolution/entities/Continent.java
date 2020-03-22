@@ -2,17 +2,20 @@ package evolution.entities;
 
 import evolution.entities.organisms.Organism;
 import evolution.utilities.ExecutorServiceUtil;
-import evolution.utilities.LoggerUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.*;
 
-public class Continent extends Thread {
+public class Continent implements Runnable {
+    private static Logger logger = LogManager.getLogger(Continent.class);
     private final int DRAW = 0;
     private final int DEFENDER_WIN = 1;
     private final int ATTACKER_WIN = 2;
+    private final int DIFFERENCE_BETWEEN_PROPERTIES = 5;
     private String name;
     private List<Organism> organisms;
     private ExecutorService executor;
@@ -32,11 +35,9 @@ public class Continent extends Thread {
     }
 
     public void addOrganisms(List<Organism> organismsList) {
-
         for(Organism organism : organismsList) {
             organisms.add(organism);
         }
-
     }
 
     public void addOrganism(Organism organism) {
@@ -50,14 +51,12 @@ public class Continent extends Thread {
             Organism defender = iterator.next();
             organisms.remove(defender);
         }
-
     }
 
     public void removeOrganism(Organism organism) {
         organisms.remove(organism);
     }
 
-    @Override
     public void run() {
         startLifeCycle();
     }
@@ -90,10 +89,9 @@ public class Continent extends Thread {
                     e.printStackTrace();
                 }
             }
-
         }
 
-        LoggerUtil.logData(getContinentData());
+        logger.info(getContinentData());
         startOrganismsFights();
     }
 
@@ -102,23 +100,28 @@ public class Continent extends Thread {
         int result;
 
         for(Organism attacker : organisms) {
-
             for(Organism defender : organisms) {
-                result = attacker.attack(defender);
 
-                if(result == DRAW) {
-                    organismsToRemove.add(attacker);
-                    organismsToRemove.add(defender);
-                } else if(result == DEFENDER_WIN) {
-                    organismsToRemove.add(attacker);
-                } else if(result == ATTACKER_WIN) {
-                    organismsToRemove.add(defender);
+                if(isFightPossible(attacker, defender)) {
+                    result = attacker.attack(defender);
+
+                    if(result == DRAW) {
+                        organismsToRemove.add(attacker);
+                        organismsToRemove.add(defender);
+                    } else if(result == DEFENDER_WIN) {
+                        organismsToRemove.add(attacker);
+                    } else if(result == ATTACKER_WIN) {
+                        organismsToRemove.add(defender);
+                    }
                 }
-
             }
-
         }
 
         removeOrganisms(organismsToRemove);
+    }
+
+    private boolean isFightPossible(Organism attacker, Organism defender) {
+        return attacker.getSumOfProperties() - defender.getSumOfProperties() > DIFFERENCE_BETWEEN_PROPERTIES &&
+                attacker.getBalance() > 0 && defender.getBalance() > 0;
     }
 }
