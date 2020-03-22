@@ -1,4 +1,4 @@
-package org.iaf.evolution.entities.organisms;
+package evolution.entities.organisms;
 
 public class Homoebolis extends Organism {
     public Homoebolis(String name) {

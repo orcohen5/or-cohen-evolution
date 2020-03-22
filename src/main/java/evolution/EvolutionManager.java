@@ -1,9 +1,9 @@
-package org.iaf.evolution;
+package evolution;
 
-import org.iaf.evolution.entities.organisms.*;
-import org.iaf.evolution.entities.Continent;
-import org.iaf.evolution.entities.Planet;
-import org.iaf.evolution.utilities.ExecutorServiceUtil;
+import evolution.entities.organisms.*;
+import evolution.entities.Continent;
+import evolution.entities.Planet;
+import evolution.utilities.ExecutorServiceUtil;
 
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;

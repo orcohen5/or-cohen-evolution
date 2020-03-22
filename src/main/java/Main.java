@@ -1,4 +1,4 @@
-import org.iaf.evolution.EvolutionManager;
+import evolution.EvolutionManager;
 
 public class Main {
     public static void main(String[] args) {

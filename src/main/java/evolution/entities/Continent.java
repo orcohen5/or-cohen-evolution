@@ -1,8 +1,8 @@
-package org.iaf.evolution.entities;
+package evolution.entities;
 
-import org.iaf.evolution.entities.organisms.Organism;
-import org.iaf.evolution.utilities.ExecutorServiceUtil;
-import org.iaf.evolution.utilities.LoggerUtil;
+import evolution.entities.organisms.Organism;
+import evolution.utilities.ExecutorServiceUtil;
+import evolution.utilities.LoggerUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;

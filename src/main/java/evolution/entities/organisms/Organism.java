@@ -1,7 +1,7 @@
-package org.iaf.evolution.entities.organisms;
+package evolution.entities.organisms;
 
-import org.iaf.evolution.utilities.LoggerUtil;
-import org.iaf.evolution.utilities.Randomizer;
+import evolution.utilities.LoggerUtil;
+import evolution.utilities.Randomizer;
 
 public abstract class Organism extends Thread {
     private final int STRENGTH = 1;

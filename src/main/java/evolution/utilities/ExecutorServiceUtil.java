@@ -1,4 +1,4 @@
-package org.iaf.evolution.utilities;
+package evolution.utilities;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
