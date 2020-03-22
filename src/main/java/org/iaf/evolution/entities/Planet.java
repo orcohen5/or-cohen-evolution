@@ -1,10 +1,9 @@
-package Places;
+package org.iaf.evolution.entities;
 
-import Organisms.Organism;
-import Utilities.ExecutorServiceUtil;
-import Utilities.LoggerUtil;
+import org.iaf.evolution.entities.organisms.Organism;
+import org.iaf.evolution.utilities.ExecutorServiceUtil;
+import org.iaf.evolution.utilities.LoggerUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
@@ -13,24 +12,30 @@ public class Planet extends TimerTask {
     private static Planet instance = null;
     private List<Continent> continents;
     private ExecutorService executor;
-    private boolean isFirstCycle;
 
-    private Planet(List<Continent> continents) {
+    private Planet() {
         notifyStart();
-        this.continents = continents;
         this.executor = ExecutorServiceUtil.getExecutor();
-        this.isFirstCycle = true;
     }
 
-    public static Planet getInstance(List<Continent> continents) {
+    public static Planet getInstance() {
 
         if(instance == null) {
-            instance = new Planet(continents);
+            instance = new Planet();
         }
+
         return instance;
     }
 
-    private List<Organism> getOrganismsInContinent(Continent continent) {
+    public List<Continent> getContinents() {
+        return continents;
+    }
+
+    public void setContinents(List<Continent> continents) {
+        this.continents = continents;
+    }
+
+    public List<Organism> getOrganismsInContinent(Continent continent) {
         return continent.getOrganisms();
     }
 
@@ -39,6 +44,7 @@ public class Planet extends TimerTask {
         for(Continent continent : continentsList) {
             continents.add(continent);
         }
+
     }
 
     public void addContinent(Continent continent) {
@@ -50,19 +56,16 @@ public class Planet extends TimerTask {
     }
 
     private void notifyStart() {
-        String startMessage = "Planet Started!" + "\n______________";
+        String startMessage = "Planet Started!";
         LoggerUtil.logData(startMessage);
     }
 
-    private synchronized void startLifeCycle() {
+    private void startLifeCycle() {
 
-        for(int i = 0; i < continents.size(); i++) {
-            executor.execute(continents.get(i));
+        for(Continent continent: continents) {
+            executor.execute(continent);
         }
 
-        if(isFirstCycle)
-            isFirstCycle = false;
-        else
-            LoggerUtil.logData("______________");
+        LoggerUtil.logData("______________");
     }
 }
