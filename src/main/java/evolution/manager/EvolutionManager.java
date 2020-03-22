@@ -1,4 +1,4 @@
-package evolution;
+package evolution.manager;
 
 import evolution.entities.organisms.*;
 import evolution.entities.Continent;
