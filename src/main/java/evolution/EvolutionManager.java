@@ -38,12 +38,12 @@ public class EvolutionManager {
         continentsList.add(new Continent("Africa", africanOrganismsList));
         continentsList.add(new Continent("Europe", europeanOrganismsList));
         continentsList.add(new Continent("America", americanOrganismsList));
-        startEvolution(continentsList);
-    }
-
-    public void startEvolution(List<Continent> continentsList) {
         Planet planet = Planet.getInstance();
         planet.setContinents(continentsList);
+        startEvolution(planet);
+    }
+
+    public void startEvolution(Planet planet) {
         executorScheduler.scheduleAtFixedRate(planet, 0, 1, TimeUnit.SECONDS);
     }
 }
