@@ -4,12 +4,15 @@ import evolution.entities.organisms.*;
 import evolution.entities.Continent;
 import evolution.entities.Planet;
 import evolution.utilities.ExecutorServiceUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class EvolutionManager {
+    private static Logger logger = LogManager.getLogger(EvolutionManager.class);
     private ScheduledExecutorService executorScheduler;
     private Planet planet;
 
@@ -47,6 +50,12 @@ public class EvolutionManager {
     }
 
     public void startEvolution() {
+        notifyStart();
         executorScheduler.scheduleAtFixedRate(planet, 0, 1, TimeUnit.SECONDS);
+    }
+
+    private void notifyStart() {
+        String startMessage = "Planet Started!";
+        logger.info(startMessage);
     }
 }

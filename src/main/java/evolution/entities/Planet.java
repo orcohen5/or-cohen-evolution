@@ -13,11 +13,9 @@ public class Planet implements Runnable {
     private static Logger logger = LogManager.getLogger(Planet.class);
     private List<Continent> continentsInPlanet;
     private ExecutorService planetExecutor;
-    private boolean isFirstCycle;
 
     private Planet() {
         this.planetExecutor = ExecutorServiceUtil.getExecutor();
-        this.isFirstCycle = true;
     }
 
     public static Planet getInstance() {
@@ -55,20 +53,10 @@ public class Planet implements Runnable {
     }
 
     private void startLifeCycle() {
-        if(isFirstCycle) {
-            notifyStart();
-            isFirstCycle = false;
-        }
-
         for(Continent continent: continentsInPlanet) {
             planetExecutor.execute(continent);
         }
 
         logger.info("______________");
-    }
-
-    private void notifyStart() {
-        String startMessage = "Planet Started!";
-        logger.info(startMessage);
     }
 }
