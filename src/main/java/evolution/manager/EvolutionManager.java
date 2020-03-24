@@ -43,7 +43,7 @@ public class EvolutionManager {
         continentsList.add(new Continent("America", americanOrganismsList));
 
         planet = Planet.getInstance();
-        planet.setContinents(continentsList);
+        planet.setContinentsInPlanet(continentsList);
     }
 
     public void startEvolution() {

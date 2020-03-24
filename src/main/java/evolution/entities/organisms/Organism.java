@@ -81,9 +81,7 @@ public abstract class Organism implements Runnable {
     public abstract void increaseProperties();
 
     public void run() {
-        increaseConstantly();
-        increaseOptionally();
-        increaseBalance();
+        startLifeCycle();
     }
 
     public String toString() {
@@ -101,29 +99,41 @@ public abstract class Organism implements Runnable {
     public int attack(Organism defender) {
         synchronized (this) {
             synchronized (defender) {
-                StringBuilder builder = new StringBuilder();
-                int result = NOT_FIGHTING_YET;
-                addFightersToFightAnnouncement(defender, builder);
+                StringBuilder fightDataBuilder = new StringBuilder();
+                int fightResult = NOT_FIGHTING_YET;
+                addFightersToFightAnnouncement(defender, fightDataBuilder);
 
                 if (isDraw(defender)) {
                     balance = 0;
                     defender.balance = 0;
-                    result = DRAW;
+                    fightResult = DRAW;
                 } else if (isDefenderWin(defender)) {
                     defender.balance = defender.balance - (balance / 2);
                     balance = 0;
-                    result = DEFENDER_WIN;
+                    fightResult = DEFENDER_WIN;
                 } else {
                     balance = balance - (defender.balance / 2);
                     defender.balance = 0;
-                    result = ATTACKER_WIN;
+                    fightResult = ATTACKER_WIN;
                 }
-                addResultToFightAnnouncement(defender, result, builder);
-                logger.info(builder.toString());
 
-                return result;
+                if(fightResult == DRAW)
+                    addDrawToFightAnnouncement(fightDataBuilder);
+                else if(fightResult == DEFENDER_WIN)
+                    addDefenderWinToFightAnnouncement(defender, fightDataBuilder);
+                else if(fightResult == ATTACKER_WIN)
+                    addAttackerWinToFightAnnouncement(fightDataBuilder);
+                logger.info(fightDataBuilder.toString());
+
+                return fightResult;
             }
         }
+    }
+
+    private void startLifeCycle() {
+        increaseConstantly();
+        increaseOptionally();
+        increaseBalance();
     }
 
     private void increaseConstantly() {
@@ -149,31 +159,22 @@ public abstract class Organism implements Runnable {
         balance *= multiplication;
     }
 
-    private void addFightersToFightAnnouncement(Organism defender, StringBuilder builder) {
-        builder.append("\nBattle Attacker -> " + toString() + "\n" +
+    private void addFightersToFightAnnouncement(Organism defender, StringBuilder fightDataBuilder) {
+        fightDataBuilder.append("\nBattle Attacker -> " + toString() + "\n" +
                 "Battle Defender -> " + defender.toString() + "\n" +
                 name + " attack " + defender.name + " -> result = ");
     }
 
-    private void addResultToFightAnnouncement(Organism defender, int result, StringBuilder builder) {
-        if(result == DRAW)
-            addDraw(builder);
-        else if(result == DEFENDER_WIN)
-            addDefenderWin(defender, builder);
-        else if(result == ATTACKER_WIN)
-            addAttackerWin(builder);
+    private void addDrawToFightAnnouncement(StringBuilder fightDataBuilder) {
+        fightDataBuilder.append("Draw\n");
     }
 
-    private void addDraw(StringBuilder builder) {
-        builder.append("Draw\n");
+    private void addDefenderWinToFightAnnouncement(Organism defender, StringBuilder fightDataBuilder) {
+        fightDataBuilder.append(defender.name + " wins\n");
     }
 
-    private void addDefenderWin(Organism defender, StringBuilder builder) {
-        builder.append(defender.name + " wins\n");
-    }
-
-    private void addAttackerWin(StringBuilder builder) {
-        builder.append(name + " wins\n");
+    private void addAttackerWinToFightAnnouncement(StringBuilder fightDataBuilder) {
+        fightDataBuilder.append(name + " wins\n");
     }
 
     private boolean isDraw(Organism defender) {

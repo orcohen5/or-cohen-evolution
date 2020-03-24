@@ -9,14 +9,15 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 public class Planet implements Runnable {
-    private static Planet instance = null;
+    private static Planet instance;
     private static Logger logger = LogManager.getLogger(Planet.class);
-    private List<Continent> continents;
-    private ExecutorService executor;
+    private List<Continent> continentsInPlanet;
+    private ExecutorService planetExecutor;
+    private boolean isFirstCycle;
 
     private Planet() {
-        notifyStart();
-        this.executor = ExecutorServiceUtil.getExecutor();
+        this.planetExecutor = ExecutorServiceUtil.getExecutor();
+        this.isFirstCycle = true;
     }
 
     public static Planet getInstance() {
@@ -27,42 +28,47 @@ public class Planet implements Runnable {
         return instance;
     }
 
-    public List<Continent> getContinents() {
-        return continents;
+    public List<Continent> getContinentsInPlanet() {
+        return continentsInPlanet;
     }
 
-    public void setContinents(List<Continent> continents) {
-        this.continents = continents;
+    public void setContinentsInPlanet(List<Continent> continentsInPlanet) {
+        this.continentsInPlanet = continentsInPlanet;
     }
 
     public List<Organism> getOrganismsInContinent(Continent continent) {
-        return continent.getOrganisms();
+        return continent.getOrganismsInContinent();
     }
 
-    public void addContinents(List<Continent> continentsList) {
+    public void addContinentsToPlanet(List<Continent> continentsList) {
         for(Continent continent : continentsList) {
-            continents.add(continent);
+            continentsInPlanet.add(continent);
         }
     }
 
-    public void addContinent(Continent continent) {
-        continents.add(continent);
+    public void addContinentToPlanet(Continent continent) {
+        continentsInPlanet.add(continent);
     }
 
     public void run() {
         startLifeCycle();
     }
 
-    private void notifyStart() {
-        String startMessage = "Planet Started!";
-        logger.info(startMessage);
-    }
-
     private void startLifeCycle() {
-        for(Continent continent: continents) {
-            executor.execute(continent);
+        if(isFirstCycle) {
+            notifyStart();
+            isFirstCycle = false;
+        }
+
+        for(Continent continent: continentsInPlanet) {
+            planetExecutor.execute(continent);
         }
 
         logger.info("______________");
+    }
+
+    private void notifyStart() {
+        String startMessage = "Planet Started!";
+        logger.info(startMessage);
     }
 }

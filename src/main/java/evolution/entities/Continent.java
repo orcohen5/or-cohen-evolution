@@ -16,45 +16,55 @@ public class Continent implements Runnable {
     private final int DEFENDER_WIN = 1;
     private final int ATTACKER_WIN = 2;
     private final int DIFFERENCE_BETWEEN_PROPERTIES = 5;
-    private String name;
-    private List<Organism> organisms;
+    private String continentName;
+    private List<Organism> organismsInContinent;
     private ExecutorService executor;
 
-    public Continent(String name, List<Organism> organisms) {
-        this.name = name;
-        this.organisms = organisms;
+    public Continent(String continentName) {
+        this.continentName = continentName;
+        this.organismsInContinent = new ArrayList();
+        this.executor = ExecutorServiceUtil.getExecutor();
+    }
+
+    public Continent(String continentName, List<Organism> organismsInContinent) {
+        this.continentName = continentName;
+        this.organismsInContinent = organismsInContinent;
         this.executor = ExecutorServiceUtil.getExecutor();
     }
 
     public String getContinentName() {
-        return name;
+        return continentName;
     }
 
-    public List<Organism> getOrganisms() {
-        return organisms;
+    public List<Organism> getOrganismsInContinent() {
+        return organismsInContinent;
     }
 
-    public void addOrganisms(List<Organism> organismsList) {
+    public void setOrganismsInContinent(List<Organism> organismsInContinent) {
+        this.organismsInContinent = organismsInContinent;
+    }
+
+    public void addOrganismsToContinent(List<Organism> organismsList) {
         for(Organism organism : organismsList) {
-            organisms.add(organism);
+            organismsInContinent.add(organism);
         }
     }
 
-    public void addOrganism(Organism organism) {
-        organisms.add(organism);
+    public void addOrganismToContinent(Organism organism) {
+        organismsInContinent.add(organism);
     }
 
-    public void removeOrganisms(List<Organism> organismsList) {
+    public void removeOrganismsFromContinent(List<Organism> organismsList) {
         Iterator<Organism> iterator = organismsList.iterator();
 
         while(iterator.hasNext()) {
             Organism defender = iterator.next();
-            organisms.remove(defender);
+            organismsInContinent.remove(defender);
         }
     }
 
-    public void removeOrganism(Organism organism) {
-        organisms.remove(organism);
+    public void removeOrganismFromContinent(Organism organism) {
+        organismsInContinent.remove(organism);
     }
 
     public void run() {
@@ -69,20 +79,20 @@ public class Continent implements Runnable {
     private String getContinentData() {
         StringBuilder builder = new StringBuilder();
 
-        for(Organism organism : organisms) {
-            builder.append(name + " -> " + organism.toString() + System.getProperty("line.separator"));
+        for(Organism organism : organismsInContinent) {
+            builder.append(continentName + " -> " + organism.toString() + System.getProperty("line.separator"));
         }
 
         return builder.toString();
     }
 
     private void startLifeCycle() {
-        Future<?> task;
+        Future<?> organismTaskResult;
 
-        for (Organism organism: organisms) {
-            task = executor.submit(organism);
+        for(Organism organism : organismsInContinent) {
+            organismTaskResult = executor.submit(organism);
 
-            while (task.isDone() == false) {
+            if(!organismTaskResult.isDone()) {
                 try {
                     Thread.sleep(10);
                 } catch (InterruptedException e) {
@@ -97,31 +107,31 @@ public class Continent implements Runnable {
 
     private void startOrganismsFights() {
         List<Organism> organismsToRemove = new ArrayList();
-        int result;
+        int fightResult;
 
-        for(Organism attacker : organisms) {
-            for(Organism defender : organisms) {
+        for(Organism attacker : organismsInContinent) {
+            for(Organism defender : organismsInContinent) {
 
                 if(isFightPossible(attacker, defender)) {
-                    result = attacker.attack(defender);
+                    fightResult = attacker.attack(defender);
 
-                    if(result == DRAW) {
+                    if(fightResult == DRAW) {
                         organismsToRemove.add(attacker);
                         organismsToRemove.add(defender);
-                    } else if(result == DEFENDER_WIN) {
+                    } else if(fightResult == DEFENDER_WIN) {
                         organismsToRemove.add(attacker);
-                    } else if(result == ATTACKER_WIN) {
+                    } else if(fightResult == ATTACKER_WIN) {
                         organismsToRemove.add(defender);
                     }
                 }
             }
         }
 
-        removeOrganisms(organismsToRemove);
+        removeOrganismsFromContinent(organismsToRemove);
     }
 
     private boolean isFightPossible(Organism attacker, Organism defender) {
-        return attacker.getSumOfProperties() - defender.getSumOfProperties() > DIFFERENCE_BETWEEN_PROPERTIES &&
-                attacker.getBalance() > 0 && defender.getBalance() > 0;
+        return (attacker.getSumOfProperties() - defender.getSumOfProperties() > DIFFERENCE_BETWEEN_PROPERTIES) &&
+                (attacker.getBalance() > 0) && (defender.getBalance() > 0);
     }
 }
