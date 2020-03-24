@@ -1,4 +1,4 @@
-package Organisms;
+package evolution.entities.organisms;
 
 public class Homoerectus extends Organism {
     public Homoerectus(String name) {

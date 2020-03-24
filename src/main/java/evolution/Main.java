@@ -1,4 +1,6 @@
-import Events.EvolutionManager;
+package evolution;
+
+import evolution.manager.EvolutionManager;
 
 public class Main {
     public static void main(String[] args) {
