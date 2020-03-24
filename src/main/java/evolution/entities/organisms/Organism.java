@@ -99,9 +99,9 @@ public abstract class Organism implements Runnable {
     public int attack(Organism defender) {
         synchronized (this) {
             synchronized (defender) {
-                StringBuilder fightDataBuilder = new StringBuilder();
+                StringBuilder fightData = new StringBuilder();
                 int fightResult = NOT_FIGHTING_YET;
-                addFightersToFightAnnouncement(defender, fightDataBuilder);
+                addFightersToFightAnnouncement(defender, fightData);
 
                 if (isDraw(defender)) {
                     balance = 0;
@@ -118,12 +118,12 @@ public abstract class Organism implements Runnable {
                 }
 
                 if(fightResult == DRAW)
-                    addDrawToFightAnnouncement(fightDataBuilder);
+                    addDrawToFightAnnouncement(fightData);
                 else if(fightResult == DEFENDER_WIN)
-                    addDefenderWinToFightAnnouncement(defender, fightDataBuilder);
+                    addDefenderWinToFightAnnouncement(defender, fightData);
                 else if(fightResult == ATTACKER_WIN)
-                    addAttackerWinToFightAnnouncement(fightDataBuilder);
-                logger.info(fightDataBuilder.toString());
+                    addAttackerWinToFightAnnouncement(fightData);
+                logger.info(fightData.toString());
 
                 return fightResult;
             }
@@ -159,22 +159,22 @@ public abstract class Organism implements Runnable {
         balance *= multiplication;
     }
 
-    private void addFightersToFightAnnouncement(Organism defender, StringBuilder fightDataBuilder) {
-        fightDataBuilder.append("\nBattle Attacker -> " + toString() + "\n" +
+    private void addFightersToFightAnnouncement(Organism defender, StringBuilder fightData) {
+        fightData.append("\nBattle Attacker -> " + toString() + "\n" +
                 "Battle Defender -> " + defender.toString() + "\n" +
                 name + " attack " + defender.name + " -> result = ");
     }
 
-    private void addDrawToFightAnnouncement(StringBuilder fightDataBuilder) {
-        fightDataBuilder.append("Draw\n");
+    private void addDrawToFightAnnouncement(StringBuilder fightData) {
+        fightData.append("Draw\n");
     }
 
-    private void addDefenderWinToFightAnnouncement(Organism defender, StringBuilder fightDataBuilder) {
-        fightDataBuilder.append(defender.name + " wins\n");
+    private void addDefenderWinToFightAnnouncement(Organism defender, StringBuilder fightData) {
+        fightData.append(defender.name + " wins\n");
     }
 
-    private void addAttackerWinToFightAnnouncement(StringBuilder fightDataBuilder) {
-        fightDataBuilder.append(name + " wins\n");
+    private void addAttackerWinToFightAnnouncement(StringBuilder fightData) {
+        fightData.append(name + " wins\n");
     }
 
     private boolean isDraw(Organism defender) {
