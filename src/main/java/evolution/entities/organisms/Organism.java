@@ -1,5 +1,6 @@
 package evolution.entities.organisms;
 
+import evolution.exceptions.CivilWarException;
 import evolution.utilities.Randomizer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,7 +14,9 @@ public abstract class Organism implements Runnable {
     private final int TECHNOLOGICAL_MEANS = 3;
     private final int NUMBER_OF_PROPERTIES = 3;
     private final int INCREASE = 1;
-    private final int NUMBER_OF_OPTIONS = 5;
+    private final int CIVIL_WAR = 1;
+    private final int NUMBER_OF_OPTIONS_TO_INCREASE = 5;
+    private final int NUMBER_OF_OPTIONS_TO_CIVIL_WAR = 10;
     private final int NOT_FIGHTING_YET = -1;
     private final int DRAW = 0;
     private final int DEFENDER_WIN = 1;
@@ -131,9 +134,34 @@ public abstract class Organism implements Runnable {
     }
 
     private void startLifeCycle() {
-        increaseConstantly();
-        increaseOptionally();
         increaseBalance();
+
+        if(isCivilWarPossible()) {
+            startCivilWar();
+        } else {
+            increaseConstantly();
+            increaseOptionally();
+        }
+    }
+
+    private boolean isCivilWarPossible() {
+        int option = Randomizer.getRandomNumber(NUMBER_OF_OPTIONS_TO_CIVIL_WAR);
+
+        if(option == CIVIL_WAR)
+            return true;
+        return false;
+    }
+
+    private void startCivilWar() {
+        long oldBalance = balance;
+        balance = balance / 2;
+
+        try {
+            throw new CivilWarException("Civil war has happened in " + getOrganismName() +
+                    " - now the balance has decreased from " + oldBalance + " to " + balance + "\n");
+        } catch (CivilWarException e) {
+            logger.warn(e.getMessage());
+        }
     }
 
     private void increaseConstantly() {
@@ -149,7 +177,7 @@ public abstract class Organism implements Runnable {
     }
 
     private void increaseOptionally() {
-        int option = Randomizer.getRandomNumber(NUMBER_OF_OPTIONS);
+        int option = Randomizer.getRandomNumber(NUMBER_OF_OPTIONS_TO_INCREASE);
 
         if (option == INCREASE)
             increaseProperties();

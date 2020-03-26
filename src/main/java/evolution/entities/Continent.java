@@ -94,7 +94,7 @@ public class Continent implements Runnable {
 
             if(!organismTaskResult.isDone()) {
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(30);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
