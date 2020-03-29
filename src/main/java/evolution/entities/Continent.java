@@ -16,20 +16,24 @@ public class Continent implements Runnable {
     private final int DEFENDER_WIN = 1;
     private final int ATTACKER_WIN = 2;
     private final int DIFFERENCE_BETWEEN_PROPERTIES = 5;
+    private final int NUMBER_OF_ART_WORKS_FOR_GOLDEN_AGE = 5;
     private String continentName;
     private List<Organism> organismsInContinent;
     private ExecutorService executor;
+    private int numberOfArtWorks;
 
     public Continent(String continentName) {
         this.continentName = continentName;
         this.organismsInContinent = new ArrayList();
         this.executor = ExecutorServiceUtil.getExecutor();
+        this.numberOfArtWorks = 0;
     }
 
     public Continent(String continentName, List<Organism> organismsInContinent) {
         this.continentName = continentName;
         this.organismsInContinent = organismsInContinent;
         this.executor = ExecutorServiceUtil.getExecutor();
+        this.numberOfArtWorks = 0;
     }
 
     public String getContinentName() {
@@ -90,19 +94,47 @@ public class Continent implements Runnable {
         Future<?> organismTaskResult;
 
         for(Organism organism : organismsInContinent) {
-            organismTaskResult = executor.submit(organism);
+            synchronized (organism) {
+                organismTaskResult = executor.submit(organism);
 
-            if(!organismTaskResult.isDone()) {
-                try {
-                    Thread.sleep(30);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if(!organismTaskResult.isDone()) {
+                    try {
+                        Thread.sleep(30);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                numberOfArtWorks += organism.contributeArtWorkByOption();
+
+                if(isGoldenAgePossible()) {
+                    logger.info(continentName + " -> Golden age has happened!\n");
+                    startGoldenAge();
                 }
             }
         }
 
         logger.info(getContinentData());
         startOrganismsFights();
+    }
+
+    private boolean isGoldenAgePossible() {
+        if(numberOfArtWorks > NUMBER_OF_ART_WORKS_FOR_GOLDEN_AGE) {
+            numberOfArtWorks -= NUMBER_OF_ART_WORKS_FOR_GOLDEN_AGE;
+
+            return true;
+        } else if(numberOfArtWorks == NUMBER_OF_ART_WORKS_FOR_GOLDEN_AGE) {
+            numberOfArtWorks = 0;
+            
+            return true;
+        }
+
+        return false;
+    }
+
+    private void startGoldenAge() {
+        for(Organism organism : organismsInContinent)
+            organism.setBalance((long) (organism.getBalance() * 1.5));
     }
 
     private void startOrganismsFights() {

@@ -17,7 +17,10 @@ public abstract class Organism implements Runnable {
     private final int CIVIL_WAR = 1;
     private final int NUMBER_OF_OPTIONS_TO_INCREASE = 5;
     private final int NUMBER_OF_OPTIONS_TO_CIVIL_WAR = 10;
-    private final int NOT_FIGHTING_YET = -1;
+    private final int NUMBER_OF_OPTIONS_TO_CONTRIBUTION = 3;
+    private final int CONTRIBUTE = 1;
+    private final int ONE_NEW_ART_WORK = 1;
+    private final int NO_NEW_ART_WORK = 0;
     private final int DRAW = 0;
     private final int DEFENDER_WIN = 1;
     private final int ATTACKER_WIN = 2;
@@ -103,7 +106,7 @@ public abstract class Organism implements Runnable {
         synchronized (this) {
             synchronized (defender) {
                 StringBuilder fightData = new StringBuilder();
-                int fightResult = NOT_FIGHTING_YET;
+                int fightResult;
                 addFightersToFightAnnouncement(defender, fightData);
 
                 if (isDraw(defender)) {
@@ -144,6 +147,10 @@ public abstract class Organism implements Runnable {
         }
     }
 
+    private void increaseBalance() {
+        balance *= multiplication;
+    }
+
     private boolean isCivilWarPossible() {
         int option = Randomizer.getRandomNumber(NUMBER_OF_OPTIONS_TO_CIVIL_WAR);
 
@@ -164,6 +171,17 @@ public abstract class Organism implements Runnable {
         }
     }
 
+    public int contributeArtWorkByOption() {
+        int option = Randomizer.getRandomNumber(NUMBER_OF_OPTIONS_TO_CONTRIBUTION);
+
+        if(option == CONTRIBUTE) {
+            logger.info(getOrganismName() + " has contributed to the golden age\n");
+            return ONE_NEW_ART_WORK;
+        } else {
+            return NO_NEW_ART_WORK;
+        }
+    }
+
     private void increaseConstantly() {
         int propertyToIncrease = Randomizer.getRandomNumber(NUMBER_OF_PROPERTIES);
 
@@ -181,10 +199,6 @@ public abstract class Organism implements Runnable {
 
         if (option == INCREASE)
             increaseProperties();
-    }
-
-    private void increaseBalance() {
-        balance *= multiplication;
     }
 
     private void addFightersToFightAnnouncement(Organism defender, StringBuilder fightData) {
