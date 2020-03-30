@@ -124,6 +124,17 @@ public abstract class Organism implements Runnable {
         }
     }
 
+    public int contributeArtworkOptionally() {
+        int chanceToContribution = Randomizer.getRandomNumber(NUMBER_OF_CHANCES_TO_CONTRIBUTION);
+
+        if(chanceToContribution == CONTRIBUTE) {
+            logger.info(getOrganismName() + " has contributed to the golden age\n");
+            return ONE_NEW_ARTWORK;
+        } else {
+            return NO_NEW_ARTWORK;
+        }
+    }
+
     @Override
     public String toString() {
         String organismData = name + " -> [" +
@@ -170,17 +181,6 @@ public abstract class Organism implements Runnable {
                     " - now the balance has decreased from " + oldBalance + " to " + balance + "\n");
         } catch (CivilWarException e) {
             logger.warn(e.getMessage());
-        }
-    }
-
-    public int contributeArtworkOptionally() {
-        int chanceToContribution = Randomizer.getRandomNumber(NUMBER_OF_CHANCES_TO_CONTRIBUTION);
-
-        if(chanceToContribution == CONTRIBUTE) {
-            logger.info(getOrganismName() + " has contributed to the golden age\n");
-            return ONE_NEW_ARTWORK;
-        } else {
-            return NO_NEW_ARTWORK;
         }
     }
 
