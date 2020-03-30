@@ -19,8 +19,8 @@ public abstract class Organism implements Runnable {
     private final int NUMBER_OF_OPTIONS_TO_CIVIL_WAR = 10;
     private final int NUMBER_OF_OPTIONS_TO_CONTRIBUTION = 3;
     private final int CONTRIBUTE = 1;
-    private final int ONE_NEW_ART_WORK = 1;
-    private final int NO_NEW_ART_WORK = 0;
+    private final int ONE_NEW_ARTWORK = 1;
+    private final int NO_NEW_ARTWORK = 0;
     private final int DRAW = 0;
     private final int DEFENDER_WIN = 1;
     private final int ATTACKER_WIN = 2;
@@ -171,14 +171,14 @@ public abstract class Organism implements Runnable {
         }
     }
 
-    public int contributeArtWorkByOption() {
+    public int contributeArtworkByOption() {
         int option = Randomizer.getRandomNumber(NUMBER_OF_OPTIONS_TO_CONTRIBUTION);
 
         if(option == CONTRIBUTE) {
             logger.info(getOrganismName() + " has contributed to the golden age\n");
-            return ONE_NEW_ART_WORK;
+            return ONE_NEW_ARTWORK;
         } else {
-            return NO_NEW_ART_WORK;
+            return NO_NEW_ARTWORK;
         }
     }
 
