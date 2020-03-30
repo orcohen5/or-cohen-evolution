@@ -56,12 +56,12 @@ public class Continent implements Runnable {
         organisms.add(organism);
     }
 
-    public void removeOrganismsFromContinent(List<Organism> organismsList) {
-        Iterator<Organism> iterator = organismsList.iterator();
+    public void removeOrganismsFromContinent(List<Organism> organisms) {
+        Iterator<Organism> iterator = organisms.iterator();
 
         while(iterator.hasNext()) {
             Organism defender = iterator.next();
-            organisms.remove(defender);
+            this.organisms.remove(defender);
         }
     }
 
