@@ -60,8 +60,8 @@ public class Continent implements Runnable {
         Iterator<Organism> iterator = organisms.iterator();
 
         while(iterator.hasNext()) {
-            Organism defender = iterator.next();
-            this.organisms.remove(defender);
+            Organism loser = iterator.next();
+            this.organisms.remove(loser);
         }
     }
 
@@ -79,13 +79,13 @@ public class Continent implements Runnable {
     }
 
     private String getContinentData() {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder continentBuilder = new StringBuilder();
 
         for(Organism organism : organisms) {
-            builder.append(name + " -> " + organism.toString() + System.getProperty("line.separator"));
+            continentBuilder.append(name + " -> " + organism.toString() + System.getProperty("line.separator"));
         }
 
-        return builder.toString();
+        return continentBuilder.toString();
     }
 
     private void startLifeCycle() {
@@ -103,9 +103,10 @@ public class Continent implements Runnable {
                     }
                 }
 
-                numberOfArtworks += organism.contributeArtworkByOption();
+                numberOfArtworks += organism.contributeArtworkOptionally();
 
                 if(isGoldenAgePossible()) {
+                    numberOfArtworks -= NUMBER_OF_ARTWORKS_FOR_GOLDEN_AGE;
                     logger.info(name + " -> Golden age has happened!\n");
                     startGoldenAge();
                 }
@@ -117,16 +118,8 @@ public class Continent implements Runnable {
     }
 
     private boolean isGoldenAgePossible() {
-        if(numberOfArtworks > NUMBER_OF_ARTWORKS_FOR_GOLDEN_AGE) {
-            numberOfArtworks -= NUMBER_OF_ARTWORKS_FOR_GOLDEN_AGE;
-
+        if(numberOfArtworks >= NUMBER_OF_ARTWORKS_FOR_GOLDEN_AGE)
             return true;
-        } else if(numberOfArtworks == NUMBER_OF_ARTWORKS_FOR_GOLDEN_AGE) {
-            numberOfArtworks = 0;
-            
-            return true;
-        }
-
         return false;
     }
 
@@ -136,7 +129,7 @@ public class Continent implements Runnable {
     }
 
     private void startOrganismsFights() {
-        List<Organism> organismsToRemove = new ArrayList();
+        List<Organism> losingOrganismsToRemove = new ArrayList();
         int fightResult;
 
         for(Organism attacker : organisms) {
@@ -146,18 +139,18 @@ public class Continent implements Runnable {
                     fightResult = attacker.attack(defender);
 
                     if(fightResult == DRAW) {
-                        organismsToRemove.add(attacker);
-                        organismsToRemove.add(defender);
+                        losingOrganismsToRemove.add(attacker);
+                        losingOrganismsToRemove.add(defender);
                     } else if(fightResult == DEFENDER_WIN) {
-                        organismsToRemove.add(attacker);
+                        losingOrganismsToRemove.add(attacker);
                     } else if(fightResult == ATTACKER_WIN) {
-                        organismsToRemove.add(defender);
+                        losingOrganismsToRemove.add(defender);
                     }
                 }
             }
         }
 
-        removeOrganisms(organismsToRemove);
+        removeOrganisms(losingOrganismsToRemove);
     }
 
     private boolean isFightPossible(Organism attacker, Organism defender) {

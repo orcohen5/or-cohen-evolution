@@ -15,9 +15,9 @@ public abstract class Organism implements Runnable {
     private final int NUMBER_OF_PROPERTIES = 3;
     private final int INCREASE = 1;
     private final int CIVIL_WAR = 1;
-    private final int NUMBER_OF_OPTIONS_TO_INCREASE = 5;
-    private final int NUMBER_OF_OPTIONS_TO_CIVIL_WAR = 10;
-    private final int NUMBER_OF_OPTIONS_TO_CONTRIBUTION = 3;
+    private final int NUMBER_OF_CHANCES_TO_INCREASE = 5;
+    private final int NUMBER_OF_CHANCES_TO_CIVIL_WAR = 10;
+    private final int NUMBER_OF_CHANCES_TO_CONTRIBUTION = 3;
     private final int CONTRIBUTE = 1;
     private final int ONE_NEW_ARTWORK = 1;
     private final int NO_NEW_ARTWORK = 0;
@@ -90,18 +90,6 @@ public abstract class Organism implements Runnable {
         startLifeCycle();
     }
 
-    public String toString() {
-        String organismData = name + " -> [" +
-                "Strength = " + strength + ", " +
-                "Intelligence = " + intelligence + ", " +
-                "Technological Means = " + technologicalMeans + ", " +
-                "Balance = " + balance + "] " +
-                "Thread[" + currentThread().getName() + "]" +
-                "[" + getType() + "]";
-
-        return organismData;
-    }
-
     public int attack(Organism defender) {
         synchronized (this) {
             synchronized (defender) {
@@ -136,14 +124,27 @@ public abstract class Organism implements Runnable {
         }
     }
 
+    @Override
+    public String toString() {
+        String organismData = name + " -> [" +
+                "Strength = " + strength + ", " +
+                "Intelligence = " + intelligence + ", " +
+                "Technological Means = " + technologicalMeans + ", " +
+                "Balance = " + balance + "] " +
+                "Thread[" + currentThread().getName() + "]" +
+                "[" + getType() + "]";
+
+        return organismData;
+    }
+
     private void startLifeCycle() {
         increaseBalance();
 
-        if(isCivilWarPossible()) {
+        if(isCivilWarOccurring()) {
             startCivilWar();
         } else {
-            increaseConstantly();
-            increaseOptionally();
+            increasePropertyConstantly();
+            increasePropertiesOptionally();
         }
     }
 
@@ -151,11 +152,12 @@ public abstract class Organism implements Runnable {
         balance *= multiplication;
     }
 
-    private boolean isCivilWarPossible() {
-        int option = Randomizer.getRandomNumber(NUMBER_OF_OPTIONS_TO_CIVIL_WAR);
+    private boolean isCivilWarOccurring() {
+        int chance = Randomizer.getRandomNumber(NUMBER_OF_CHANCES_TO_CIVIL_WAR);
 
-        if(option == CIVIL_WAR)
+        if(chance == CIVIL_WAR) {
             return true;
+        }
         return false;
     }
 
@@ -171,10 +173,10 @@ public abstract class Organism implements Runnable {
         }
     }
 
-    public int contributeArtworkByOption() {
-        int option = Randomizer.getRandomNumber(NUMBER_OF_OPTIONS_TO_CONTRIBUTION);
+    public int contributeArtworkOptionally() {
+        int chanceToContribution = Randomizer.getRandomNumber(NUMBER_OF_CHANCES_TO_CONTRIBUTION);
 
-        if(option == CONTRIBUTE) {
+        if(chanceToContribution == CONTRIBUTE) {
             logger.info(getOrganismName() + " has contributed to the golden age\n");
             return ONE_NEW_ARTWORK;
         } else {
@@ -182,7 +184,7 @@ public abstract class Organism implements Runnable {
         }
     }
 
-    private void increaseConstantly() {
+    private void increasePropertyConstantly() {
         int propertyToIncrease = Randomizer.getRandomNumber(NUMBER_OF_PROPERTIES);
 
         if (propertyToIncrease == STRENGTH) {
@@ -194,8 +196,8 @@ public abstract class Organism implements Runnable {
         }
     }
 
-    private void increaseOptionally() {
-        int option = Randomizer.getRandomNumber(NUMBER_OF_OPTIONS_TO_INCREASE);
+    private void increasePropertiesOptionally() {
+        int option = Randomizer.getRandomNumber(NUMBER_OF_CHANCES_TO_INCREASE);
 
         if (option == INCREASE)
             increaseProperties();
