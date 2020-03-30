@@ -16,24 +16,22 @@ public class Continent implements Runnable {
     private final int DEFENDER_WIN = 1;
     private final int ATTACKER_WIN = 2;
     private final int DIFFERENCE_BETWEEN_PROPERTIES = 5;
-    private final int NUMBER_OF_ART_WORKS_FOR_GOLDEN_AGE = 5;
+    private final int NUMBER_OF_ARTWORKS_FOR_GOLDEN_AGE = 5;
     private String continentName;
     private List<Organism> organismsInContinent;
     private ExecutorService executor;
-    private int numberOfArtWorks;
+    private int numberOfArtworks;
 
     public Continent(String continentName) {
         this.continentName = continentName;
         this.organismsInContinent = new ArrayList();
         this.executor = ExecutorServiceUtil.getExecutor();
-        this.numberOfArtWorks = 0;
+        this.numberOfArtworks = 0;
     }
 
     public Continent(String continentName, List<Organism> organismsInContinent) {
-        this.continentName = continentName;
+        this(continentName);
         this.organismsInContinent = organismsInContinent;
-        this.executor = ExecutorServiceUtil.getExecutor();
-        this.numberOfArtWorks = 0;
     }
 
     public String getContinentName() {
@@ -105,7 +103,7 @@ public class Continent implements Runnable {
                     }
                 }
 
-                numberOfArtWorks += organism.contributeArtWorkByOption();
+                numberOfArtworks += organism.contributeArtworkByOption();
 
                 if(isGoldenAgePossible()) {
                     logger.info(continentName + " -> Golden age has happened!\n");
@@ -119,12 +117,12 @@ public class Continent implements Runnable {
     }
 
     private boolean isGoldenAgePossible() {
-        if(numberOfArtWorks > NUMBER_OF_ART_WORKS_FOR_GOLDEN_AGE) {
-            numberOfArtWorks -= NUMBER_OF_ART_WORKS_FOR_GOLDEN_AGE;
+        if(numberOfArtworks > NUMBER_OF_ARTWORKS_FOR_GOLDEN_AGE) {
+            numberOfArtworks -= NUMBER_OF_ARTWORKS_FOR_GOLDEN_AGE;
 
             return true;
-        } else if(numberOfArtWorks == NUMBER_OF_ART_WORKS_FOR_GOLDEN_AGE) {
-            numberOfArtWorks = 0;
+        } else if(numberOfArtworks == NUMBER_OF_ARTWORKS_FOR_GOLDEN_AGE) {
+            numberOfArtworks = 0;
             
             return true;
         }
