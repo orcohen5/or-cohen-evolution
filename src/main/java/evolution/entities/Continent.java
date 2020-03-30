@@ -17,25 +17,25 @@ public class Continent implements Runnable {
     private final int ATTACKER_WIN = 2;
     private final int DIFFERENCE_BETWEEN_PROPERTIES = 5;
     private final int NUMBER_OF_ARTWORKS_FOR_GOLDEN_AGE = 5;
-    private String continentName;
+    private String name;
     private List<Organism> organisms;
     private ExecutorService executor;
     private int numberOfArtworks;
 
-    public Continent(String continentName) {
-        this.continentName = continentName;
+    public Continent(String name) {
+        this.name = name;
         this.organisms = new ArrayList();
         this.executor = ExecutorServiceUtil.getExecutor();
         this.numberOfArtworks = 0;
     }
 
-    public Continent(String continentName, List<Organism> organisms) {
-        this(continentName);
+    public Continent(String name, List<Organism> organisms) {
+        this(name);
         this.organisms = organisms;
     }
 
-    public String getContinentName() {
-        return continentName;
+    public String getName() {
+        return name;
     }
 
     public List<Organism> getOrganisms() {
@@ -46,13 +46,13 @@ public class Continent implements Runnable {
         this.organisms = organisms;
     }
 
-    public void addOrganismsToContinent(List<Organism> organismsList) {
+    public void addOrganisms(List<Organism> organismsList) {
         for(Organism organism : organismsList) {
             organisms.add(organism);
         }
     }
 
-    public void addOrganismToContinent(Organism organism) {
+    public void addOrganism(Organism organism) {
         organisms.add(organism);
     }
 
@@ -82,7 +82,7 @@ public class Continent implements Runnable {
         StringBuilder builder = new StringBuilder();
 
         for(Organism organism : organisms) {
-            builder.append(continentName + " -> " + organism.toString() + System.getProperty("line.separator"));
+            builder.append(name + " -> " + organism.toString() + System.getProperty("line.separator"));
         }
 
         return builder.toString();
@@ -106,7 +106,7 @@ public class Continent implements Runnable {
                 numberOfArtworks += organism.contributeArtworkByOption();
 
                 if(isGoldenAgePossible()) {
-                    logger.info(continentName + " -> Golden age has happened!\n");
+                    logger.info(name + " -> Golden age has happened!\n");
                     startGoldenAge();
                 }
             }
