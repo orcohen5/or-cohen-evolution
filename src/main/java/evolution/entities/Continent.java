@@ -56,7 +56,7 @@ public class Continent implements Runnable {
         organisms.add(organism);
     }
 
-    public void removeOrganismsFromContinent(List<Organism> organisms) {
+    public void removeOrganisms(List<Organism> organisms) {
         Iterator<Organism> iterator = organisms.iterator();
 
         while(iterator.hasNext()) {
@@ -65,7 +65,7 @@ public class Continent implements Runnable {
         }
     }
 
-    public void removeOrganismFromContinent(Organism organism) {
+    public void removeOrganism(Organism organism) {
         organisms.remove(organism);
     }
 
@@ -157,7 +157,7 @@ public class Continent implements Runnable {
             }
         }
 
-        removeOrganismsFromContinent(organismsToRemove);
+        removeOrganisms(organismsToRemove);
     }
 
     private boolean isFightPossible(Organism attacker, Organism defender) {
