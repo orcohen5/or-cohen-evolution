@@ -18,42 +18,42 @@ public class Continent implements Runnable {
     private final int DIFFERENCE_BETWEEN_PROPERTIES = 5;
     private final int NUMBER_OF_ARTWORKS_FOR_GOLDEN_AGE = 5;
     private String continentName;
-    private List<Organism> organismsInContinent;
+    private List<Organism> organisms;
     private ExecutorService executor;
     private int numberOfArtworks;
 
     public Continent(String continentName) {
         this.continentName = continentName;
-        this.organismsInContinent = new ArrayList();
+        this.organisms = new ArrayList();
         this.executor = ExecutorServiceUtil.getExecutor();
         this.numberOfArtworks = 0;
     }
 
-    public Continent(String continentName, List<Organism> organismsInContinent) {
+    public Continent(String continentName, List<Organism> organisms) {
         this(continentName);
-        this.organismsInContinent = organismsInContinent;
+        this.organisms = organisms;
     }
 
     public String getContinentName() {
         return continentName;
     }
 
-    public List<Organism> getOrganismsInContinent() {
-        return organismsInContinent;
+    public List<Organism> getOrganisms() {
+        return organisms;
     }
 
-    public void setOrganismsInContinent(List<Organism> organismsInContinent) {
-        this.organismsInContinent = organismsInContinent;
+    public void setOrganisms(List<Organism> organisms) {
+        this.organisms = organisms;
     }
 
     public void addOrganismsToContinent(List<Organism> organismsList) {
         for(Organism organism : organismsList) {
-            organismsInContinent.add(organism);
+            organisms.add(organism);
         }
     }
 
     public void addOrganismToContinent(Organism organism) {
-        organismsInContinent.add(organism);
+        organisms.add(organism);
     }
 
     public void removeOrganismsFromContinent(List<Organism> organismsList) {
@@ -61,12 +61,12 @@ public class Continent implements Runnable {
 
         while(iterator.hasNext()) {
             Organism defender = iterator.next();
-            organismsInContinent.remove(defender);
+            organisms.remove(defender);
         }
     }
 
     public void removeOrganismFromContinent(Organism organism) {
-        organismsInContinent.remove(organism);
+        organisms.remove(organism);
     }
 
     public void run() {
@@ -81,7 +81,7 @@ public class Continent implements Runnable {
     private String getContinentData() {
         StringBuilder builder = new StringBuilder();
 
-        for(Organism organism : organismsInContinent) {
+        for(Organism organism : organisms) {
             builder.append(continentName + " -> " + organism.toString() + System.getProperty("line.separator"));
         }
 
@@ -91,7 +91,7 @@ public class Continent implements Runnable {
     private void startLifeCycle() {
         Future<?> organismTaskResult;
 
-        for(Organism organism : organismsInContinent) {
+        for(Organism organism : organisms) {
             synchronized (organism) {
                 organismTaskResult = executor.submit(organism);
 
@@ -131,7 +131,7 @@ public class Continent implements Runnable {
     }
 
     private void startGoldenAge() {
-        for(Organism organism : organismsInContinent)
+        for(Organism organism : organisms)
             organism.setBalance((long) (organism.getBalance() * 1.5));
     }
 
@@ -139,8 +139,8 @@ public class Continent implements Runnable {
         List<Organism> organismsToRemove = new ArrayList();
         int fightResult;
 
-        for(Organism attacker : organismsInContinent) {
-            for(Organism defender : organismsInContinent) {
+        for(Organism attacker : organisms) {
+            for(Organism defender : organisms) {
 
                 if(isFightPossible(attacker, defender)) {
                     fightResult = attacker.attack(defender);

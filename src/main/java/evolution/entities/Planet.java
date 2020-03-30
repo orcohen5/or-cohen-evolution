@@ -35,7 +35,7 @@ public class Planet implements Runnable {
     }
 
     public List<Organism> getOrganismsInContinent(Continent continent) {
-        return continent.getOrganismsInContinent();
+        return continent.getOrganisms();
     }
 
     public void addContinentsToPlanet(List<Continent> continentsList) {
