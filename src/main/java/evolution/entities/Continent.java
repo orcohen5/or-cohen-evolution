@@ -16,7 +16,8 @@ public class Continent implements Runnable {
     private final int DEFENDER_WIN = 1;
     private final int ATTACKER_WIN = 2;
     private final int DIFFERENCE_BETWEEN_PROPERTIES = 5;
-    private final int NUMBER_OF_ARTWORKS_FOR_GOLDEN_AGE = 5;
+    private final int ARTWORKS_FOR_GOLDEN_AGE = 5;
+    private final double GOLDEN_AGE_MULTIPLIER = 1.5;
     private String name;
     private List<Organism> organisms;
     private ExecutorService executor;
@@ -106,7 +107,7 @@ public class Continent implements Runnable {
                 numberOfArtworks += organism.contributeArtworkOptionally();
 
                 if(isGoldenAgePossible()) {
-                    numberOfArtworks -= NUMBER_OF_ARTWORKS_FOR_GOLDEN_AGE;
+                    numberOfArtworks -= ARTWORKS_FOR_GOLDEN_AGE;
                     logger.info(name + " -> Golden age has happened!\n");
                     startGoldenAge();
                 }
@@ -118,18 +119,19 @@ public class Continent implements Runnable {
     }
 
     private boolean isGoldenAgePossible() {
-        if(numberOfArtworks >= NUMBER_OF_ARTWORKS_FOR_GOLDEN_AGE)
+        if(numberOfArtworks >= ARTWORKS_FOR_GOLDEN_AGE) {
             return true;
+        }
         return false;
     }
 
     private void startGoldenAge() {
         for(Organism organism : organisms)
-            organism.setBalance((long) (organism.getBalance() * 1.5));
+            organism.setBalance((long) (organism.getBalance() * GOLDEN_AGE_MULTIPLIER));
     }
 
     private void startOrganismsFights() {
-        List<Organism> losingOrganismsToRemove = new ArrayList();
+        List<Organism> losingOrganisms = new ArrayList();
         int fightResult;
 
         for(Organism attacker : organisms) {
@@ -139,18 +141,18 @@ public class Continent implements Runnable {
                     fightResult = attacker.attack(defender);
 
                     if(fightResult == DRAW) {
-                        losingOrganismsToRemove.add(attacker);
-                        losingOrganismsToRemove.add(defender);
+                        losingOrganisms.add(attacker);
+                        losingOrganisms.add(defender);
                     } else if(fightResult == DEFENDER_WIN) {
-                        losingOrganismsToRemove.add(attacker);
+                        losingOrganisms.add(attacker);
                     } else if(fightResult == ATTACKER_WIN) {
-                        losingOrganismsToRemove.add(defender);
+                        losingOrganisms.add(defender);
                     }
                 }
             }
         }
 
-        removeOrganisms(losingOrganismsToRemove);
+        removeOrganisms(losingOrganisms);
     }
 
     private boolean isFightPossible(Organism attacker, Organism defender) {

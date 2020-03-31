@@ -15,9 +15,9 @@ public abstract class Organism implements Runnable {
     private final int NUMBER_OF_PROPERTIES = 3;
     private final int INCREASE = 1;
     private final int CIVIL_WAR = 1;
-    private final int NUMBER_OF_CHANCES_TO_INCREASE = 5;
-    private final int NUMBER_OF_CHANCES_TO_CIVIL_WAR = 10;
-    private final int NUMBER_OF_CHANCES_TO_CONTRIBUTION = 3;
+    private final int CHANCES_TO_INCREASE = 5;
+    private final int CHANCES_TO_CIVIL_WAR = 10;
+    private final int CHANCES_TO_CONTRIBUTION = 3;
     private final int CONTRIBUTE = 1;
     private final int ONE_NEW_ARTWORK = 1;
     private final int NO_NEW_ARTWORK = 0;
@@ -91,10 +91,11 @@ public abstract class Organism implements Runnable {
     }
 
     public int attack(Organism defender) {
+        int fightResult;
+
         synchronized (this) {
             synchronized (defender) {
                 StringBuilder fightData = new StringBuilder();
-                int fightResult;
                 addFightersToFightAnnouncement(defender, fightData);
 
                 if (isDraw(defender)) {
@@ -111,12 +112,14 @@ public abstract class Organism implements Runnable {
                     fightResult = ATTACKER_WIN;
                 }
 
-                if(fightResult == DRAW)
+                if(fightResult == DRAW) {
                     addDrawToFightAnnouncement(fightData);
-                else if(fightResult == DEFENDER_WIN)
+                } else if(fightResult == DEFENDER_WIN) {
                     addDefenderWinToFightAnnouncement(defender, fightData);
-                else if(fightResult == ATTACKER_WIN)
+                } else if(fightResult == ATTACKER_WIN) {
                     addAttackerWinToFightAnnouncement(fightData);
+                }
+
                 logger.info(fightData.toString());
 
                 return fightResult;
@@ -125,7 +128,7 @@ public abstract class Organism implements Runnable {
     }
 
     public int contributeArtworkOptionally() {
-        int chanceToContribution = Randomizer.getRandomNumber(NUMBER_OF_CHANCES_TO_CONTRIBUTION);
+        int chanceToContribution = Randomizer.getRandomNumber(CHANCES_TO_CONTRIBUTION);
 
         if(chanceToContribution == CONTRIBUTE) {
             logger.info(getOrganismName() + " has contributed to the golden age\n");
@@ -152,10 +155,14 @@ public abstract class Organism implements Runnable {
         increaseBalance();
 
         if(isCivilWarOccurring()) {
-            startCivilWar();
+            try {
+                startCivilWar();
+            } catch (CivilWarException e) {
+                logger.warn(e.getMessage());
+            }
         } else {
-            increasePropertyConstantly();
-            increasePropertiesOptionally();
+            increaseOneFromAllProperties();
+            increasePropertiesByChance();
         }
     }
 
@@ -164,7 +171,7 @@ public abstract class Organism implements Runnable {
     }
 
     private boolean isCivilWarOccurring() {
-        int chance = Randomizer.getRandomNumber(NUMBER_OF_CHANCES_TO_CIVIL_WAR);
+        int chance = Randomizer.getRandomNumber(CHANCES_TO_CIVIL_WAR);
 
         if(chance == CIVIL_WAR) {
             return true;
@@ -172,19 +179,14 @@ public abstract class Organism implements Runnable {
         return false;
     }
 
-    private void startCivilWar() {
+    private void startCivilWar() throws CivilWarException {
         long oldBalance = balance;
         balance = balance / 2;
-
-        try {
-            throw new CivilWarException("Civil war has happened in " + getOrganismName() +
-                    " - now the balance has decreased from " + oldBalance + " to " + balance + "\n");
-        } catch (CivilWarException e) {
-            logger.warn(e.getMessage());
-        }
+        throw new CivilWarException("Civil war has happened in " + getOrganismName() +
+                " - now the balance has decreased from " + oldBalance + " to " + balance + "\n");
     }
 
-    private void increasePropertyConstantly() {
+    private void increaseOneFromAllProperties() {
         int propertyToIncrease = Randomizer.getRandomNumber(NUMBER_OF_PROPERTIES);
 
         if (propertyToIncrease == STRENGTH) {
@@ -196,11 +198,12 @@ public abstract class Organism implements Runnable {
         }
     }
 
-    private void increasePropertiesOptionally() {
-        int option = Randomizer.getRandomNumber(NUMBER_OF_CHANCES_TO_INCREASE);
+    private void increasePropertiesByChance() {
+        int option = Randomizer.getRandomNumber(CHANCES_TO_INCREASE);
 
-        if (option == INCREASE)
+        if (option == INCREASE) {
             increaseProperties();
+        }
     }
 
     private void addFightersToFightAnnouncement(Organism defender, StringBuilder fightData) {
