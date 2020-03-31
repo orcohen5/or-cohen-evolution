@@ -20,7 +20,6 @@ public abstract class Organism implements Runnable {
     private final int CHANCES_TO_CONTRIBUTION = 3;
     private final int CONTRIBUTE = 1;
     private final int ONE_NEW_ARTWORK = 1;
-    private final int NO_NEW_ARTWORK = 0;
     private final int DRAW = 0;
     private final int DEFENDER_WIN = 1;
     private final int ATTACKER_WIN = 2;
@@ -134,7 +133,7 @@ public abstract class Organism implements Runnable {
             logger.info(getOrganismName() + " has contributed to the golden age\n");
             return ONE_NEW_ARTWORK;
         } else {
-            return NO_NEW_ARTWORK;
+            return 0;
         }
     }
 
