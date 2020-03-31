@@ -1,5 +1,6 @@
 package evolution.entities.organisms;
 
+import evolution.exceptions.CivilWarException;
 import evolution.utilities.Randomizer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,8 +14,12 @@ public abstract class Organism implements Runnable {
     private final int TECHNOLOGICAL_MEANS = 3;
     private final int NUMBER_OF_PROPERTIES = 3;
     private final int INCREASE = 1;
-    private final int NUMBER_OF_OPTIONS = 5;
-    private final int NOT_FIGHTING_YET = -1;
+    private final int CIVIL_WAR = 1;
+    private final int CHANCES_TO_INCREASE = 5;
+    private final int CHANCES_TO_CIVIL_WAR = 10;
+    private final int CHANCES_TO_CONTRIBUTION = 3;
+    private final int CONTRIBUTE = 1;
+    private final int ONE_NEW_ARTWORK = 1;
     private final int DRAW = 0;
     private final int DEFENDER_WIN = 1;
     private final int ATTACKER_WIN = 2;
@@ -84,23 +89,12 @@ public abstract class Organism implements Runnable {
         startLifeCycle();
     }
 
-    public String toString() {
-        String organismData = name + " -> [" +
-                "Strength = " + strength + ", " +
-                "Intelligence = " + intelligence + ", " +
-                "Technological Means = " + technologicalMeans + ", " +
-                "Balance = " + balance + "] " +
-                "Thread[" + currentThread().getName() + "]" +
-                "[" + getType() + "]";
-
-        return organismData;
-    }
-
     public int attack(Organism defender) {
+        int fightResult;
+
         synchronized (this) {
             synchronized (defender) {
                 StringBuilder fightData = new StringBuilder();
-                int fightResult = NOT_FIGHTING_YET;
                 addFightersToFightAnnouncement(defender, fightData);
 
                 if (isDraw(defender)) {
@@ -117,12 +111,14 @@ public abstract class Organism implements Runnable {
                     fightResult = ATTACKER_WIN;
                 }
 
-                if(fightResult == DRAW)
+                if(fightResult == DRAW) {
                     addDrawToFightAnnouncement(fightData);
-                else if(fightResult == DEFENDER_WIN)
+                } else if(fightResult == DEFENDER_WIN) {
                     addDefenderWinToFightAnnouncement(defender, fightData);
-                else if(fightResult == ATTACKER_WIN)
+                } else if(fightResult == ATTACKER_WIN) {
                     addAttackerWinToFightAnnouncement(fightData);
+                }
+
                 logger.info(fightData.toString());
 
                 return fightResult;
@@ -130,13 +126,66 @@ public abstract class Organism implements Runnable {
         }
     }
 
-    private void startLifeCycle() {
-        increaseConstantly();
-        increaseOptionally();
-        increaseBalance();
+    public int contributeArtworkOptionally() {
+        int chanceToContribution = Randomizer.getRandomNumber(CHANCES_TO_CONTRIBUTION);
+
+        if(chanceToContribution == CONTRIBUTE) {
+            logger.info(getOrganismName() + " has contributed to the golden age\n");
+            return ONE_NEW_ARTWORK;
+        } else {
+            return 0;
+        }
     }
 
-    private void increaseConstantly() {
+    @Override
+    public String toString() {
+        String organismData = name + " -> [" +
+                "Strength = " + strength + ", " +
+                "Intelligence = " + intelligence + ", " +
+                "Technological Means = " + technologicalMeans + ", " +
+                "Balance = " + balance + "] " +
+                "Thread[" + currentThread().getName() + "]" +
+                "[" + getType() + "]";
+
+        return organismData;
+    }
+
+    private void startLifeCycle() {
+        increaseBalance();
+
+        if(isCivilWarOccurring()) {
+            try {
+                startCivilWar();
+            } catch (CivilWarException e) {
+                logger.info(e.getMessage());
+            }
+        } else {
+            increaseOneFromAllProperties();
+            increasePropertiesByChance();
+        }
+    }
+
+    private void increaseBalance() {
+        balance *= multiplication;
+    }
+
+    private boolean isCivilWarOccurring() {
+        int chance = Randomizer.getRandomNumber(CHANCES_TO_CIVIL_WAR);
+
+        if(chance == CIVIL_WAR) {
+            return true;
+        }
+        return false;
+    }
+
+    private void startCivilWar() throws CivilWarException {
+        long oldBalance = balance;
+        balance = balance / 2;
+        throw new CivilWarException("Civil war has happened in " + getOrganismName() +
+                " - now the balance has decreased from " + oldBalance + " to " + balance + "\n");
+    }
+
+    private void increaseOneFromAllProperties() {
         int propertyToIncrease = Randomizer.getRandomNumber(NUMBER_OF_PROPERTIES);
 
         if (propertyToIncrease == STRENGTH) {
@@ -148,15 +197,12 @@ public abstract class Organism implements Runnable {
         }
     }
 
-    private void increaseOptionally() {
-        int option = Randomizer.getRandomNumber(NUMBER_OF_OPTIONS);
+    private void increasePropertiesByChance() {
+        int option = Randomizer.getRandomNumber(CHANCES_TO_INCREASE);
 
-        if (option == INCREASE)
+        if (option == INCREASE) {
             increaseProperties();
-    }
-
-    private void increaseBalance() {
-        balance *= multiplication;
+        }
     }
 
     private void addFightersToFightAnnouncement(Organism defender, StringBuilder fightData) {
