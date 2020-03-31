@@ -157,7 +157,7 @@ public abstract class Organism implements Runnable {
             try {
                 startCivilWar();
             } catch (CivilWarException e) {
-                logger.warn(e.getMessage());
+                logger.info(e.getMessage());
             }
         } else {
             increaseOneFromAllProperties();
