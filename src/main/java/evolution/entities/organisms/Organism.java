@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import static java.lang.Thread.currentThread;
 
-public abstract class Organism implements Runnable {
+public abstract class Organism implements Runnable, Comparable {
     private static Logger logger = LogManager.getLogger(Organism.class);
     private final int STRENGTH = 1;
     private final int INTELLIGENCE = 2;
@@ -23,6 +23,8 @@ public abstract class Organism implements Runnable {
     private final int DRAW = 0;
     private final int DEFENDER_WIN = 1;
     private final int ATTACKER_WIN = 2;
+    private final int CONTINENTAL = 0;
+    private final int INTERCONTINENTAL = 1;
     private double strength;
     private double intelligence;
     private double technologicalMeans;
@@ -83,19 +85,27 @@ public abstract class Organism implements Runnable {
 
     public abstract String getType();
 
+    public int compareTo(Object organism) {
+        long comparedBalance=((Organism)organism).getBalance();
+
+        return (int) (comparedBalance-this.balance);
+    }
+
     public abstract void increaseProperties();
 
     public void run() {
         startLifeCycle();
     }
 
-    public int attack(Organism defender) {
+    public int attack(Organism defender, int fightType) {
         int fightResult;
 
         synchronized (this) {
             synchronized (defender) {
                 StringBuilder fightData = new StringBuilder();
-                addFightersToFightAnnouncement(defender, fightData);
+                if(fightType == CONTINENTAL) {
+                    addFightersToFightAnnouncement(defender, fightData);
+                }
 
                 if (isDraw(defender)) {
                     balance = 0;
@@ -111,15 +121,17 @@ public abstract class Organism implements Runnable {
                     fightResult = ATTACKER_WIN;
                 }
 
-                if(fightResult == DRAW) {
-                    addDrawToFightAnnouncement(fightData);
-                } else if(fightResult == DEFENDER_WIN) {
-                    addDefenderWinToFightAnnouncement(defender, fightData);
-                } else if(fightResult == ATTACKER_WIN) {
-                    addAttackerWinToFightAnnouncement(fightData);
-                }
+                if(fightType == CONTINENTAL) {
+                    if(fightResult == DRAW) {
+                        addDrawToFightAnnouncement(fightData);
+                    } else if(fightResult == DEFENDER_WIN) {
+                        addDefenderWinToFightAnnouncement(defender, fightData);
+                    } else if(fightResult == ATTACKER_WIN) {
+                        addAttackerWinToFightAnnouncement(fightData);
+                    }
 
-                logger.info(fightData.toString());
+                    logger.info(fightData.toString());
+                }
 
                 return fightResult;
             }
