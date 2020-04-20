@@ -3,7 +3,9 @@ package evolution.manager;
 import evolution.entities.organisms.*;
 import evolution.entities.Continent;
 import evolution.entities.Planet;
+import evolution.utilities.DynamicList;
 import evolution.utilities.ExecutorServiceUtil;
+import evolution.utilities.OrganismFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,24 +23,25 @@ public class EvolutionManager {
     }
 
     public void initializeEvolution() {
-        List<Organism> asianOrganismsList = new ArrayList();
-        List<Organism> africanOrganismsList = new ArrayList();
-        List<Organism> europeanOrganismsList = new ArrayList();
-        List<Organism> americanOrganismsList = new ArrayList();
+        List<Organism> asianOrganismsList = new DynamicList();
+        List<Organism> africanOrganismsList = new DynamicList();
+        List<Organism> europeanOrganismsList = new DynamicList();
+        List<Organism> americanOrganismsList = new DynamicList();
         List<Continent> continentsList = new ArrayList();
+        OrganismFactory factory = new OrganismFactory();
 
-        asianOrganismsList.add(new Homosepian("Nadav"));
-        asianOrganismsList.add(new Homoebolis("Yehuda"));
-        asianOrganismsList.add(new Homofloresiensis("Or"));
-        africanOrganismsList.add(new Neanderthal("Demoza"));
-        africanOrganismsList.add(new Homoerectus("Benny"));
-        africanOrganismsList.add(new Homosepian("Zohar"));
-        europeanOrganismsList.add(new Homoerectus("Tal"));
-        europeanOrganismsList.add(new Neanderthal("Sapir"));
-        europeanOrganismsList.add(new Homofloresiensis("Netanel"));
-        americanOrganismsList.add(new Homosepian("Shalom"));
-        americanOrganismsList.add(new Neanderthal("Ori"));
-        americanOrganismsList.add(new Homoebolis("Efi"));
+        asianOrganismsList.add(factory.getOrganism("Nadav", "Homosepian"));
+        asianOrganismsList.add(factory.getOrganism("Yehuda", "Homoebolis"));
+        asianOrganismsList.add(factory.getOrganism("Or", "Homofloresiensis"));
+        africanOrganismsList.add(factory.getOrganism("Demoza", "Neanderthal"));
+        africanOrganismsList.add(factory.getOrganism("Benny", "Homoerectus"));
+        africanOrganismsList.add(factory.getOrganism("Zohar", "Homosepian"));
+        europeanOrganismsList.add(factory.getOrganism("Tal", "Homoerectus"));
+        europeanOrganismsList.add(factory.getOrganism("Sapir", "Neanderthal"));
+        europeanOrganismsList.add(factory.getOrganism("Netanel", "Homofloresiensis"));
+        americanOrganismsList.add(factory.getOrganism("Shalom", "Homosepian"));
+        americanOrganismsList.add(factory.getOrganism("Ori", "Neanderthal"));
+        americanOrganismsList.add(factory.getOrganism("Efi", "Homoebolis"));
 
         continentsList.add(new Continent("Asia", asianOrganismsList));
         continentsList.add(new Continent("Africa", africanOrganismsList));
@@ -55,7 +58,7 @@ public class EvolutionManager {
     }
 
     private void notifyStart() {
-        String startMessage = "Planet Started!";
+        String startMessage = "Planet Started!" + "\n______________";
         logger.info(startMessage);
     }
 }
