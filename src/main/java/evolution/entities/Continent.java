@@ -1,6 +1,7 @@
 package evolution.entities;
 
 import evolution.entities.organisms.Organism;
+import evolution.utilities.DynamicList;
 import evolution.utilities.ExecutorServiceUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,63 +16,98 @@ public class Continent implements Runnable {
     private final int DRAW = 0;
     private final int DEFENDER_WIN = 1;
     private final int ATTACKER_WIN = 2;
+    private final int CONTINENTAL = 0;
+    private final int INTERCONTINENTAL = 1;
     private final int DIFFERENCE_BETWEEN_PROPERTIES = 5;
     private final int ARTWORKS_FOR_GOLDEN_AGE = 5;
     private final double GOLDEN_AGE_MULTIPLIER = 1.5;
-    private String name;
-    private List<Organism> organisms;
+    private String continentName;
+    private List<Organism> organismsInContinent;
     private ExecutorService executor;
     private int numberOfArtworks;
 
-    public Continent(String name) {
-        this.name = name;
-        this.organisms = new ArrayList();
+    public Continent(String continentName) {
+        this.continentName = continentName;
+        this.organismsInContinent = new DynamicList<Organism>();
         this.executor = ExecutorServiceUtil.getExecutor();
         this.numberOfArtworks = 0;
     }
 
-    public Continent(String name, List<Organism> organisms) {
-        this(name);
-        this.organisms = organisms;
+    public Continent(String continentName, List<Organism> organismsInContinent) {
+        this(continentName);
+        this.organismsInContinent = organismsInContinent;
     }
 
-    public String getName() {
-        return name;
+    public String getContinentName() {
+        return continentName;
     }
 
-    public List<Organism> getOrganisms() {
-        return organisms;
+    public List<Organism> getOrganismsInContinent() {
+        return organismsInContinent;
     }
 
-    public void setOrganisms(List<Organism> organisms) {
-        this.organisms = organisms;
+    public void setOrganismsInContinent(List<Organism> organismsInContinent) {
+        this.organismsInContinent = organismsInContinent;
     }
 
-    public void addOrganisms(List<Organism> organismsList) {
+    public Organism getFirstOrganismInContinent() {
+        List<Organism> organismsInContinent = getOrganismsInContinent();
+        Organism firstOrganism = organismsInContinent.get(0);
+
+        return firstOrganism;
+    }
+
+    public void addOrganismsToContinent(List<Organism> organismsList) {
         for(Organism organism : organismsList) {
-            organisms.add(organism);
+            organismsInContinent.add(organism);
         }
     }
 
-    public void addOrganism(Organism organism) {
-        organisms.add(organism);
+    public void addOrganismToContinent(Organism organism) {
+        organismsInContinent.add(organism);
     }
 
-    public void removeOrganisms(List<Organism> organisms) {
+    public void removeOrganismsFromContinent(List<Organism> organisms) {
         Iterator<Organism> iterator = organisms.iterator();
 
         while(iterator.hasNext()) {
             Organism loser = iterator.next();
-            this.organisms.remove(loser);
+            this.organismsInContinent.remove(loser);
         }
     }
 
-    public void removeOrganism(Organism organism) {
-        organisms.remove(organism);
+    public void removeOrganismFromContinent(Organism organism) {
+        organismsInContinent.remove(organism);
     }
 
     public void run() {
         startLifeCycle();
+    }
+
+    public int attack(Continent defendingContinent) {
+        int fightResult;
+
+        synchronized (this) {
+            synchronized (defendingContinent) {
+                StringBuilder fightData = new StringBuilder();
+                Organism attacker = getFirstOrganismInContinent();
+                Organism defender = defendingContinent.getFirstOrganismInContinent();
+                addFightersToFightAnnouncement(defendingContinent, fightData);
+                fightResult = attacker.attack(defender, INTERCONTINENTAL);
+
+                if(fightResult == DRAW) {
+                    addDrawToFightAnnouncement(fightData);
+                } else if(fightResult == DEFENDER_WIN) {
+                    addDefenderWinToFightAnnouncement(defendingContinent, fightData);
+                } else if(fightResult == ATTACKER_WIN) {
+                    addAttackerWinToFightAnnouncement(fightData);
+                }
+
+                logger.info(fightData.toString());
+
+                return fightResult;
+            }
+        }
     }
 
     @Override
@@ -82,8 +118,8 @@ public class Continent implements Runnable {
     private String getContinentData() {
         StringBuilder continentBuilder = new StringBuilder();
 
-        for(Organism organism : organisms) {
-            continentBuilder.append(name + " -> " + organism.toString() + System.getProperty("line.separator"));
+        for(Organism organism : organismsInContinent) {
+            continentBuilder.append(continentName + " -> " + organism.toString() + System.getProperty("line.separator"));
         }
 
         return continentBuilder.toString();
@@ -92,13 +128,13 @@ public class Continent implements Runnable {
     private void startLifeCycle() {
         Future<?> organismTaskResult;
 
-        for(Organism organism : organisms) {
+        for(Organism organism : organismsInContinent) {
             synchronized (organism) {
                 organismTaskResult = executor.submit(organism);
 
                 if(!organismTaskResult.isDone()) {
                     try {
-                        Thread.sleep(30);
+                        Thread.sleep(40);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -108,14 +144,15 @@ public class Continent implements Runnable {
 
                 if(isGoldenAgePossible()) {
                     numberOfArtworks -= ARTWORKS_FOR_GOLDEN_AGE;
-                    logger.info(name + " -> Golden age has happened!\n");
+                    logger.info(continentName + " -> Golden age has happened!\n");
                     startGoldenAge();
                 }
             }
         }
-
+        ((DynamicList) organismsInContinent).sortByComparable();
         logger.info(getContinentData());
         startOrganismsFights();
+
     }
 
     private boolean isGoldenAgePossible() {
@@ -126,7 +163,7 @@ public class Continent implements Runnable {
     }
 
     private void startGoldenAge() {
-        for(Organism organism : organisms)
+        for(Organism organism : organismsInContinent)
             organism.setBalance((long) (organism.getBalance() * GOLDEN_AGE_MULTIPLIER));
     }
 
@@ -134,11 +171,11 @@ public class Continent implements Runnable {
         List<Organism> losingOrganisms = new ArrayList();
         int fightResult;
 
-        for(Organism attacker : organisms) {
-            for(Organism defender : organisms) {
+        for(Organism attacker : organismsInContinent) {
+            for(Organism defender : organismsInContinent) {
 
                 if(isFightPossible(attacker, defender)) {
-                    fightResult = attacker.attack(defender);
+                    fightResult = attacker.attack(defender, CONTINENTAL);
 
                     if(fightResult == DRAW) {
                         losingOrganisms.add(attacker);
@@ -152,11 +189,35 @@ public class Continent implements Runnable {
             }
         }
 
-        removeOrganisms(losingOrganisms);
+        removeOrganismsFromContinent(losingOrganisms);
     }
 
     private boolean isFightPossible(Organism attacker, Organism defender) {
         return (attacker.getSumOfProperties() - defender.getSumOfProperties() > DIFFERENCE_BETWEEN_PROPERTIES) &&
                 (attacker.getBalance() > 0) && (defender.getBalance() > 0);
+    }
+
+    private void addFightersToFightAnnouncement(Continent defendingContinent, StringBuilder fightData) {
+        fightData.append("\nContinent Battle Attacker -> " + getContinentData() +
+                "Continent Battle Defender -> " + defendingContinent.getContinentData() +
+                continentName + ":" + getFirstOrganismNameInContinent() + " attack " + defendingContinent.continentName + ":" + defendingContinent.getFirstOrganismNameInContinent() + " -> result = ");
+    }
+
+    private void addDrawToFightAnnouncement(StringBuilder fightData) {
+        fightData.append("Draw\n");
+    }
+
+    private void addDefenderWinToFightAnnouncement(Continent defendingContinent, StringBuilder fightData) {
+        fightData.append(defendingContinent.continentName + ":" + defendingContinent.getFirstOrganismNameInContinent() + " wins\n" +
+                "Winner -> " + defendingContinent.getContinentData());
+    }
+
+    private void addAttackerWinToFightAnnouncement(StringBuilder fightData) {
+        fightData.append(continentName + ":" + getFirstOrganismNameInContinent() + " wins\n" +
+                "Winner -> " + getContinentData());
+    }
+
+    private String getFirstOrganismNameInContinent() {
+        return getFirstOrganismInContinent().getOrganismName();
     }
 }
